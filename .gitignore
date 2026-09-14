@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.python-version
+*.egg-info/
+
+# Node (OpenSpec CLI / tooling only, not an app dependency)
+node_modules/
+
+# Data
+*.db
+*.sqlite
+*.sqlite3
+data/.yf-cache/
+
+# Static export
+dist/
+
+# Editor / OS
+.DS_Store

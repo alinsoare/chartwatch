@@ -1,0 +1,94 @@
+# Release to GitHub Pages.
+#
+# Two authorized triggers: workflow_dispatch (manual) and schedule (twice daily).
+# No push trigger — nothing else fetches data.
+#
+# Scheduled runs fire twice per day at 03:00 and 15:00 UTC (GitHub Actions cron
+# has no timezone field). They are unconditional: always restore, incremental sync,
+# persist snapshot, export, and redeploy, even when no code changed. Full
+# refresh stays manual-only — inputs.full is unset on schedule, so sync never
+# gets --full.
+#
+# The cron is read from this file on the default branch only; the job still
+# checks out ref: release, so scheduled runs never publish unreleased work from
+# main.
+#
+# Every step except the deploy runs the same commands a maintainer uses
+# locally (see README "Rehearse locally first"), so this file stays a thin
+# wrapper: restore snapshot -> sync -> persist snapshot -> export -> deploy.
+
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      full:
+        description: "Full refresh (re-pull each timeframe's whole fetch window)"
+        type: boolean
+        default: false
+  schedule:
+    - cron: "0 3,15 * * *"
+
+permissions:
+  contents: write # push the data-branch snapshot
+  pages: write
+  id-token: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: release
+
+      - name: Restore market.db snapshot from the data branch
+        run: |
+          if git fetch origin data 2>/dev/null; then
+            mkdir -p data
+            git cat-file blob FETCH_HEAD:market.db > data/market.db
+            echo "restored snapshot from data branch"
+          else
+            echo "no data branch yet - first release does the full backfill"
+          fi
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Sync market data (incremental on top of the snapshot)
+        run: |
+          args=""
+          if [ "${{ inputs.full }}" = "true" ]; then args="$args --full"; fi
+          uv run chartwatch sync $args
+
+      - name: Persist the snapshot as a replace commit on the data branch
+        # A fresh root commit each release keeps exactly one binary snapshot
+        # in the branch history instead of accumulating them forever.
+        run: |
+          blob=$(git hash-object -w data/market.db)
+          tree=$(printf '100644 blob %s\tmarket.db\n' "$blob" | git mktree)
+          commit=$(GIT_AUTHOR_NAME=github-actions GIT_AUTHOR_EMAIL=actions@github.com \
+                   GIT_COMMITTER_NAME=github-actions GIT_COMMITTER_EMAIL=actions@github.com \
+                   git commit-tree "$tree" -m "data snapshot $(date -u +%FT%TZ)")
+          git push --force origin "$commit:refs/heads/data"
+
+      - name: Export the static site
+        run: uv run chartwatch export
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - id: deploy
+        uses: actions/deploy-pages@v4

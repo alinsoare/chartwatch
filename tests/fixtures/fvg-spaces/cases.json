@@ -1,0 +1,138 @@
+{
+  "point_size": 0.01,
+  "cases": [
+    {
+      "name": "bullish-space",
+      "rule": "close-to-open-space",
+      "bars": [
+        { "time": 0, "open": 100, "high": 102, "low": 99, "close": 101 },
+        { "time": 3600, "open": 101.5, "high": 104, "low": 101, "close": 103 }
+      ],
+      "checks": [{ "index": 0, "has_space": false }, { "index": 1, "has_space": true }],
+      "extended_body": { "index": 1, "value": 2 },
+      "extended_range": { "index": 1, "value": 3 }
+    },
+    {
+      "name": "bearish-space",
+      "rule": "close-to-open-space",
+      "bars": [
+        { "time": 0, "open": 105, "high": 106, "low": 102, "close": 103 },
+        { "time": 3600, "open": 102.5, "high": 104, "low": 101, "close": 101.5 }
+      ],
+      "checks": [{ "index": 0, "has_space": false }, { "index": 1, "has_space": true }],
+      "extended_body": { "index": 1, "value": 1.5 },
+      "extended_range": { "index": 1, "value": 3 }
+    },
+    {
+      "name": "overlapping-bodies-no-space",
+      "rule": "close-to-open-space",
+      "bars": [
+        { "time": 0, "open": 100, "high": 102, "low": 99, "close": 101 },
+        { "time": 3600, "open": 100.5, "high": 103, "low": 100, "close": 102.5 }
+      ],
+      "checks": [{ "index": 1, "has_space": false }],
+      "extended_body": { "index": 1, "value": 2 },
+      "extended_range": { "index": 1, "value": 3 }
+    },
+    {
+      "name": "opposite-types-no-space",
+      "rule": "close-to-open-space",
+      "bars": [
+        { "time": 0, "open": 100, "high": 102, "low": 99, "close": 101 },
+        { "time": 3600, "open": 102, "high": 103, "low": 100, "close": 100.5 }
+      ],
+      "checks": [{ "index": 1, "has_space": false }]
+    },
+    {
+      "name": "neutral-borrows-bullish-type",
+      "rule": "close-to-open-space",
+      "bars": [
+        { "time": 0, "open": 100, "high": 100.5, "low": 99.5, "close": 100 },
+        { "time": 3600, "open": 100.5, "high": 103, "low": 100, "close": 102 }
+      ],
+      "checks": [{ "index": 1, "has_space": true }],
+      "extended_body": { "index": 1, "value": 2 }
+    },
+    {
+      "name": "dead-flat-run-then-real-bar",
+      "rule": "close-to-open-space",
+      "bars": [
+        { "time": 0, "open": 50, "high": 50, "low": 50, "close": 50 },
+        { "time": 3600, "open": 50, "high": 50, "low": 50, "close": 50 },
+        { "time": 7200, "open": 50, "high": 50, "low": 50, "close": 50 },
+        { "time": 10800, "open": 55, "high": 58, "low": 54.5, "close": 57 }
+      ],
+      "checks": [
+        { "index": 1, "has_space": false },
+        { "index": 2, "has_space": false },
+        { "index": 3, "has_space": true }
+      ],
+      "extended_body": { "index": 3, "value": 7 }
+    },
+    {
+      "name": "body-dominance-gain-from-bar2-space",
+      "rule": "body-dominance",
+      "triplet_bars": [
+        { "time": 18000, "open": 100, "high": 101, "low": 99.5, "close": 100.5 },
+        { "time": 21600, "open": 101.5, "high": 104, "low": 101, "close": 102.5 },
+        { "time": 25200, "open": 102.5, "high": 106, "low": 103.5, "close": 104 },
+        { "time": 28800, "open": 104, "high": 105, "low": 103, "close": 104 }
+      ],
+      "recorded_dominance_passes": false,
+      "extended_dominance_passes": true,
+      "zone_count": 1
+    },
+    {
+      "name": "body-dominance-loss-from-bar3-space",
+      "rule": "body-dominance",
+      "triplet_bars": [
+        { "time": 18000, "open": 100, "high": 101, "low": 99, "close": 100.5 },
+        { "time": 21600, "open": 100.5, "high": 105, "low": 100, "close": 104 },
+        { "time": 25200, "open": 105.5, "high": 108, "low": 105, "close": 107.6 },
+        { "time": 28800, "open": 107.6, "high": 108, "low": 107, "close": 107.5 }
+      ],
+      "recorded_dominance_passes": true,
+      "extended_dominance_passes": false,
+      "zone_count": 0
+    },
+    {
+      "name": "bar3-wick-limit-extended-body",
+      "rule": "bar3-wick-limit",
+      "params": { "bar3_wick_body_mult": 2 },
+      "triplet_bars": [
+        { "time": 18000, "open": 100, "high": 101, "low": 99.5, "close": 100.5 },
+        { "time": 21600, "open": 100.5, "high": 104, "low": 100, "close": 103 },
+        { "time": 25200, "open": 104.5, "high": 108, "low": 104, "close": 105.2 },
+        { "time": 28800, "open": 105.2, "high": 106, "low": 105, "close": 105.5 }
+      ],
+      "recorded_wick_passes": false,
+      "extended_wick_passes": true,
+      "zone_count": 1
+    },
+    {
+      "name": "gap-vs-bar2-extended-range",
+      "rule": "gap-vs-bar2-range",
+      "params": { "gap_vs_bar2_range": 0.5 },
+      "triplet_bars": [
+        { "time": 18000, "open": 100, "high": 101, "low": 99.5, "close": 100.5 },
+        { "time": 21600, "open": 105, "high": 106, "low": 104.5, "close": 105.5 },
+        { "time": 25200, "open": 105.5, "high": 108, "low": 103.2, "close": 107 },
+        { "time": 28800, "open": 107, "high": 108, "low": 106, "close": 107 }
+      ],
+      "recorded_gap_passes": true,
+      "extended_gap_passes": false,
+      "zone_count": 0
+    },
+    {
+      "name": "zone-recorded-prices",
+      "rule": "zone-recorded-prices",
+      "triplet_bars": [
+        { "time": 18000, "open": 100, "high": 101, "low": 99.5, "close": 100.5 },
+        { "time": 21600, "open": 101.5, "high": 104, "low": 101, "close": 102.5 },
+        { "time": 25200, "open": 102.5, "high": 106, "low": 103.5, "close": 104 },
+        { "time": 28800, "open": 104, "high": 105, "low": 103, "close": 104 }
+      ],
+      "zone_count": 1
+    }
+  ]
+}

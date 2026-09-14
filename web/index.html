@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>chartwatch</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Pinned CDN build; exposes the global LightweightCharts. No bundler, no build step. -->
+  <script src="https://unpkg.com/lightweight-charts@5.0.9/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+  <aside id="sidebar">
+    <header class="sidebar-head">
+      <h1>chartwatch</h1>
+      <div id="catalog-summary" class="muted"></div>
+    </header>
+    <input id="search" type="search" placeholder="Search instruments…" autocomplete="off">
+    <div class="filters">
+      <select id="asset-filter"><option value="">All classes</option></select>
+      <select id="currency-filter"><option value="">All currencies</option></select>
+      <select id="exchange-filter"><option value="">All exchanges</option></select>
+      <select id="sort-order" title="Sort order">
+        <option value="default">Default order</option>
+        <option value="score">Sort by score</option>
+        <option value="symbol">Symbol A–Z</option>
+        <option value="name">Name A–Z</option>
+        <option value="headroom">Most headroom</option>
+      </select>
+      <label class="check"><input type="checkbox" id="compatible-only"> compatible only</label>
+      <label class="check"><input type="checkbox" id="enabled-only"> enabled only</label>
+      <button type="button" id="clear-filters">Clear filters &amp; sort</button>
+    </div>
+    <ul id="symbol-list"></ul>
+  </aside>
+
+  <main>
+    <header id="chart-header">
+      <div>
+        <h2 id="chart-title">—</h2>
+        <div id="chart-subtitle" class="muted"></div>
+      </div>
+      <div id="chart-badges"></div>
+    </header>
+
+    <div id="toolbar">
+      <div id="timeframes" class="btn-group" title="Timeframe"></div>
+      <div id="indicator-toggles" class="btn-group" title="Indicators"></div>
+      <div id="toolbar-right">
+        <div id="chart-tools" class="btn-group" title="Chart tools"></div>
+        <button id="jump-to-latest" type="button"
+                title="Scroll to the newest bar at 90% of the chart width without changing zoom">Latest</button>
+        <label id="display-limit-control" class="check"
+               title="How many of the most recent bars to draw. A positive whole number, or 'all'.">
+          bars
+          <input id="display-limit" type="text" inputmode="numeric"
+                 autocomplete="off" spellcheck="false" size="5">
+        </label>
+        <div id="sync-controls" class="hidden">
+          <label id="periodic-refresh-control" class="check"
+                 title="Run an incremental sync every 15 minutes. This session only — never resumed on reload.">
+            <input type="checkbox" id="periodic-refresh"> auto 15m
+          </label>
+          <label class="check"><input type="checkbox" id="full-refresh"> full refresh</label>
+          <button id="sync-selected">Sync selected</button>
+          <button id="sync-all" class="primary">Sync all</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="sync-progress" class="hidden">
+      <div id="progress-track"><div id="progress-fill"></div></div>
+      <span id="progress-text"></span>
+    </div>
+
+    <div id="chart-notice" class="hidden"></div>
+
+    <div id="chart-wrap">
+      <div id="chart"></div>
+      <div id="chart-empty" class="hidden">No bars stored for this timeframe. Sync to populate.</div>
+      <div id="legend" class="hidden"></div>
+      <button
+        id="auto-scale"
+        type="button"
+        aria-pressed="true"
+        aria-label="Automatic vertical scale"
+        title="Automatic vertical scale"
+      >AUTO</button>
+    </div>
+
+    <footer id="meta-footer" class="muted"></footer>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

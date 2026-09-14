@@ -1,0 +1,16 @@
+VAN.DE, Advantest Corp
+LOTB.BE, Lotus Bakeries NV
+MIE1.DE, Mitsubishi Electric Corp
+ASI1.DE, Asics Corp
+HIA1.DE, Hitachi Ltd
+AJI.DE, Ajinomoto Co Inc
+MUR1.DE, Murata Manufacturing Co Ltd
+MIH.DE, Mitsubishi Heavy Industries Ltd
+LLY.DE, Eli Lilly and Co
+ARGX.BE, Argenx SE
+ASM.NL, ASM International NV
+C7A0.DE, Contemporary Amperex Technology Co Ltd
+VX1.DE, Vertex Pharmaceuticals Inc
+SALM.NO, Salmar ASA
+SAABB.SE, Saab AB - class B
+HOT.DE, HOCHTIEF AG

@@ -1,0 +1,59 @@
+schema: spec-driven
+
+# Project context (optional)
+# This is shown to AI when creating artifacts.
+# Add your tech stack, conventions, style guides, domain knowledge, etc.
+# Example:
+#   context: |
+#     Tech stack: TypeScript, React, Node.js
+#     We use conventional commits
+#     Domain: e-commerce platform
+
+context: |
+  This repo is a ground-up rebuild of an earlier version of this app. That
+  sibling repo is the behavioral reference only — do not copy its code, history, or
+  file layout verbatim. Re-derive the design from its documented behavior and
+  constraints, improving on them where it makes sense.
+
+  What the app does: interactive OHLC candlestick charts for a curated list of
+  instruments. Price data comes from Yahoo Finance and is stored locally
+  (SQLite in the reference implementation) rather than fetched live.
+
+  Non-negotiable constraint carried over from the reference app: the app is
+  offline-first by design. In the application — dev UI and published site —
+  data syncs only because the user asked for it: a sync control pressed, or a
+  periodic refresh the user switches on for the current session, which starts
+  off on every load and is never restored automatically. Do not propose
+  client-side scheduling, a refresh that runs without the user switching it on,
+  startup auto-sync, resuming a previously enabled refresh on a later load,
+  fetch-on-view, live streaming quotes, websockets, or any network call
+  triggered merely by loading/viewing a chart. The single sanctioned exception
+  is the release workflow's twice-daily CI schedule (03:00 and 15:00 UTC), which keeps the
+  published snapshot fresh without anyone touching GitHub. If a feature seems to
+  need fresher data in the app, the answer is a control the user operates, not
+  an implicit fetch.
+
+  Conceptual responsibilities worth preserving (not file names — this is a
+  fresh design): fetching market data, persisting/querying it, deriving
+  coarser timeframes from finer ones, orchestrating a sync run, and serving an
+  HTTP surface — kept as separate concerns rather than mixed together.
+
+  The reference implementation's stack was Python (managed with uv) on the
+  backend and a build-step-free vanilla JS frontend (no bundler, no frontend
+  framework, no Node runtime dependency). Treat that as a starting default,
+  not a hard requirement, unless the proposal says otherwise.
+
+operations:
+  archive:
+    guidance:
+      - |
+        One change is one commit. After the archive has moved the change and
+        synced its specs, offer a single commit covering the whole change: the
+        code it produced, its own artifacts under changes/archive/, and the
+        synced main specs. Archiving without committing leaves a detailed
+        tasks.md with no commit to point at, so the record says what was
+        intended while git can no longer say what was done.
+      - |
+        Draft the commit message from the change name and its proposal's
+        intent. Commit only that change's work — if unrelated edits are sitting
+        in the tree, stage by hunk rather than sweeping them in.
