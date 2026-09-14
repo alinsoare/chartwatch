@@ -98,7 +98,7 @@ class TestWindows:
         for method in (SyncRunner.run, SyncRunner.try_start):
             params = set(inspect.signature(method).parameters)
             assert "targets" not in params
-            assert params == {"self", "symbols", "full", "periodic"}
+            assert params == {"self", "symbols", "full"}
 
     def test_first_sync_uses_the_timeframes_fetch_window(self, db_path, catalog_csv, recorder):
         SyncRunner(db_path, catalog_csv).run(symbols=["AAA.DE"])
@@ -190,89 +190,6 @@ class TestWindows:
         with store.connect(db_path) as conn:
             # 1,500 — deeper than the old 1,000-bar target, and nothing trims it.
             assert store.bar_count(conn, "AAA.DE", "d1") == 1_500
-
-
-class TestPeriodicSkipping:
-    """A periodic run leaves alone what the source cannot yet have added."""
-
-    def seed_mixed_ages(self, db_path):
-        now = datetime.now(UTC)
-        seed_newest(db_path, "AAA.DE", "w1", now - timedelta(days=2))  # < 7d: skip
-        seed_newest(db_path, "AAA.DE", "d1", now - timedelta(hours=2))  # < 24h: skip
-        seed_newest(db_path, "AAA.DE", "h1", now - timedelta(minutes=70))  # > 1h: fetch
-
-    def test_periodic_run_skips_only_what_cannot_have_a_new_bar(
-        self, db_path, catalog_csv, recorder
-    ):
-        self.seed_mixed_ages(db_path)
-        progress = SyncRunner(db_path, catalog_csv).run(
-            symbols=["AAA.DE"], periodic=True
-        )
-
-        assert {c["tf"] for c in recorder.calls} == {"h1"}
-        assert progress.results[0].skipped == ["d1", "w1"]
-        assert progress.periodic is True
-
-    def test_periodic_run_fetches_nothing_when_every_timeframe_is_too_recent(
-        self, db_path, catalog_csv, recorder
-    ):
-        now = datetime.now(UTC)
-        seed_newest(db_path, "AAA.DE", "w1", now - timedelta(days=2))
-        seed_newest(db_path, "AAA.DE", "d1", now - timedelta(hours=2))
-        seed_newest(db_path, "AAA.DE", "h1", now - timedelta(minutes=30))
-        with store.connect(db_path) as conn:
-            store.record_sync(
-                conn, "AAA.DE", "h1", status="ok", message="",
-                last_sync_utc="2026-01-01T00:00:00+00:00", last_bar_ts=42,
-            )
-
-        progress = SyncRunner(db_path, catalog_csv).run(
-            symbols=["AAA.DE"], periodic=True
-        )
-
-        assert recorder.calls == []
-        assert progress.results[0].skipped == ["h1", "d1", "w1"]
-        assert progress.results[0].status == "ok"
-        with store.connect(db_path) as conn:
-            h1 = store.get_sync_state(conn)[("AAA.DE", "h1")]
-        assert h1["last_sync_utc"] == "2026-01-01T00:00:00+00:00"
-        assert h1["last_bar_ts"] == 42
-
-    def test_a_timeframe_holding_no_bars_is_never_skipped(
-        self, db_path, catalog_csv, recorder
-    ):
-        now = datetime.now(UTC)
-        seed_newest(db_path, "AAA.DE", "w1", now - timedelta(days=2))
-        seed_newest(db_path, "AAA.DE", "d1", now - timedelta(hours=2))
-        # h1 deliberately left empty: no newest bar to measure against.
-        SyncRunner(db_path, catalog_csv).run(symbols=["AAA.DE"], periodic=True)
-        assert any(c["tf"] == "h1" for c in recorder.calls)
-
-    def test_a_skip_leaves_the_recorded_sync_state_untouched(
-        self, db_path, catalog_csv, recorder
-    ):
-        self.seed_mixed_ages(db_path)
-        with store.connect(db_path) as conn:
-            store.record_sync(
-                conn, "AAA.DE", "w1", status="ok", message="",
-                last_sync_utc="2026-01-01T00:00:00+00:00", last_bar_ts=42,
-            )
-
-        SyncRunner(db_path, catalog_csv).run(symbols=["AAA.DE"], periodic=True)
-
-        with store.connect(db_path) as conn:
-            w1 = store.get_sync_state(conn)[("AAA.DE", "w1")]
-        # Freshness must keep reflecting the last run that actually fetched.
-        assert w1["last_sync_utc"] == "2026-01-01T00:00:00+00:00"
-        assert w1["last_bar_ts"] == 42
-
-    def test_a_manual_run_skips_nothing(self, db_path, catalog_csv, recorder):
-        self.seed_mixed_ages(db_path)
-        progress = SyncRunner(db_path, catalog_csv).run(symbols=["AAA.DE"])
-
-        assert {c["tf"] for c in recorder.calls} == set(TIMEFRAMES)
-        assert progress.results[0].skipped == []
-        assert progress.periodic is False
 
 
 class TestScopeAndIsolation:

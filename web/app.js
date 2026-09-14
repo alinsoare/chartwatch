@@ -33,10 +33,6 @@ import { visibleSymbolList } from "./symbol-list.js";
 import { renderScreenerRow } from "./screener/render.js";
 import { runScan } from "./screener/scan.js";
 
-/* An incremental sync, repeated while the user leaves the control on. With
- * the finest timeframe hourly, most ticks skip every series and fetch nothing. */
-const PERIODIC_REFRESH_MS = 15 * 60 * 1000;
-
 const storage = browserStorage();
 
 const state = {
@@ -52,9 +48,6 @@ const state = {
   autoScale: true,
   enabledIndicators: new Set(),
   syncPolling: null,
-  // Session-only, and deliberately never persisted: restoring it would make the
-  // app fetch on load, which is the startup auto-sync the project forbids.
-  periodicTimer: null,
   screenerScores: {},
   screenerScanning: false,
   screenerProgress: null,
@@ -85,8 +78,6 @@ const el = {
   syncAll: document.getElementById("sync-all"),
   syncSelected: document.getElementById("sync-selected"),
   fullRefresh: document.getElementById("full-refresh"),
-  periodicRefresh: document.getElementById("periodic-refresh"),
-  periodicRefreshControl: document.getElementById("periodic-refresh-control"),
   displayLimit: document.getElementById("display-limit"),
   jumpToLatest: document.getElementById("jump-to-latest"),
   progress: document.getElementById("sync-progress"),
@@ -636,17 +627,10 @@ function select(ticker) {
 
 /* ---------- Sync (dev mode only) ---------- */
 
-async function startSync(symbols, { periodic = false } = {}) {
-  // A refresh arriving mid-run is dropped, not queued. The server would answer
-  // the second trigger with a conflict anyway; checking here keeps that expected
-  // case out of the error display.
-  if (periodic && state.syncPolling) return;
-
+async function startSync(symbols) {
   const body = {
     symbols: symbols || null,
-    // A periodic refresh is always incremental, whatever the checkbox says.
-    full: periodic ? false : el.fullRefresh.checked,
-    periodic,
+    full: el.fullRefresh.checked,
   };
   try {
     await getJSON("api/sync", {
@@ -667,9 +651,6 @@ function setSyncing(active) {
   el.progress.classList.toggle("hidden", !active);
 }
 
-/* `state.syncPolling` doubles as "a run is in flight", which is what a periodic
- * refresh checks before dropping its tick. It must therefore be cleared, not
- * merely stopped, or the first run would suppress every refresh after it. */
 function stopPolling() {
   clearInterval(state.syncPolling);
   state.syncPolling = null;
@@ -711,21 +692,7 @@ function summarise(status) {
   if (failed.length) {
     return `Done with ${failed.length} error(s): ${failed.map((f) => f.ticker).join(", ")}`;
   }
-  const skipped = results.reduce((sum, r) => sum + (r.skipped || []).length, 0);
-  const note = skipped ? ` · ${skipped} timeframe(s) already current` : "";
-  return `Synced ${status.total} instruments · ${bars.toLocaleString()} bars written${note}`;
-}
-
-/* Session-scoped timer, owned entirely by the control that switches it on. */
-function setPeriodicRefresh(on) {
-  clearInterval(state.periodicTimer);
-  state.periodicTimer = null;
-  el.periodicRefreshControl.classList.toggle("on", on);
-  if (!on) return;
-  state.periodicTimer = setInterval(
-    () => startSync(null, { periodic: true }),
-    PERIODIC_REFRESH_MS,
-  );
+  return `Synced ${status.total} instruments · ${bars.toLocaleString()} bars written`;
 }
 
 /* ---------- Helpers ---------- */
@@ -756,8 +723,8 @@ function reportError(error) {
 /* ---------- Settings ---------- */
 
 /* Written on every change the user makes. Sync state is absent on purpose: the
- * full-refresh option and the periodic-refresh control both come back off, so a
- * reload can never resume fetching. Tool state is absent too — a measurement
+ * full-refresh option comes back off on every load, so a reload can never resume
+ * fetching. Tool state is absent too — a measurement
  * refers to specific bars and restoring one against a grown series would lie. */
 function persist() {
   if (!state.ready) return;
@@ -838,12 +805,6 @@ el.syncAll.addEventListener("click", () => startSync(null));
 el.syncSelected.addEventListener("click", () =>
   startSync(state.selected ? [state.selected] : null),
 );
-el.periodicRefresh.addEventListener("change", () =>
-  setPeriodicRefresh(el.periodicRefresh.checked),
-);
-// Leaving the page stops the timer as surely as switching it off does.
-window.addEventListener("beforeunload", () => setPeriodicRefresh(false));
-
 async function boot() {
   const stored = readSettings(storage);
 
@@ -852,8 +813,7 @@ async function boot() {
     ? "d1"
     : state.meta.timeframe_order[0];
 
-  // Sync controls, periodic refresh included, exist only where a backend does.
-  // Static mode stays passive.
+  // Sync controls exist only where a backend does. Static mode stays passive.
   el.syncControls.classList.toggle("hidden", state.meta.mode !== "dev");
 
   // The catalog first, without selecting anything: a restored instrument has to

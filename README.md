@@ -6,9 +6,9 @@ locally in SQLite. A ground-up rebuild of an earlier version of this app,
 planned and tracked with [OpenSpec](https://openspec.dev/) (see `openspec/`).
 
 **The data is always offline.** Nothing is fetched because you opened a chart.
-A sync happens only when you ask for one — a button in the dev UI, a periodic
-refresh you switch on for the current session, the sync CLI, a manually
-dispatched release workflow, or the release workflow's twice-daily schedule at
+A sync happens only when you ask for one — a button in the dev UI, the sync
+CLI, a manually dispatched release workflow, or the release workflow's
+twice-daily schedule at
 03:00 and 15:00 UTC
 (which keeps the published site fresh without anyone touching GitHub). If the
 data looks stale, the answer is a sync, never an implicit fetch.
@@ -103,27 +103,10 @@ unknown timeframe — falls back to its default without disturbing the rest, and
 a browser that denies storage just runs on defaults.
 
 Sync state is deliberately excluded, so a reload can never resume fetching:
-**full refresh** and **auto 15m** both come back off on every load. Measurements
+**full refresh** comes back off on every load. Measurements
 and zoom position are not restored either — the restored instrument and timeframe
 open on the default 200-bar framing instead. None of this travels with the
 exported data.
-
-## Periodic refresh (dev mode only)
-
-The **auto 15m** checkbox next to the sync buttons runs an incremental sync
-every 15 minutes for as long as it is on. It is off by default, authorizes
-refreshes for the current session only — a reload always turns it off — and a
-tick that lands while a sync is running is dropped rather than queued. It does
-not exist on the published site, which has no backend to sync with.
-
-Each refresh skips any symbol/timeframe where less than one bar's duration has
-passed since its newest stored bar, because the source cannot yet have a bar
-that is not already held: W1 is left alone for seven days, D1 for 24 hours, H1
-for an hour. Only H1 can produce a new bar between ticks; a refresh that finds
-every timeframe too recent fetches nothing and reports every timeframe as
-skipped. A skipped timeframe keeps the freshness of the last run that actually
-fetched it. Pressing a sync button always fetches everything — the rule applies
-to periodic runs only.
 
 ## Indicators
 

@@ -1,8 +1,8 @@
 """On-demand synchronisation of Yahoo data into SQLite.
 
-A run happens only because the user asked for one — a button in the dev UI, a
-periodic refresh the user switched on for the current session, the headless CLI,
-or a manually dispatched CI workflow. Nothing here starts a run on its own.
+A run happens only because the user asked for one — a button in the dev UI, the
+headless CLI, or a manually dispatched CI workflow. Nothing here starts a run on
+its own.
 
 A run only ever adds bars. It carries no depth parameter: how deep an initial
 backfill reaches is the timeframe's own property, and an incremental run starts
@@ -33,8 +33,6 @@ class SymbolResult:
     ticker: str
     status: str = "pending"
     bars_written: int = 0
-    #: Timeframe keys a periodic run left alone because no new bar can exist yet.
-    skipped: list[str] = field(default_factory=list)
     currency: str | None = None
     messages: list[str] = field(default_factory=list)
 
@@ -48,9 +46,6 @@ class SyncProgress:
     completed: int = 0
     current: str | None = None
     full: bool = False
-    #: True for a run driven by the periodic refresh, which skips timeframes that
-    #: cannot yet have a new bar. A manual run always fetches every timeframe.
-    periodic: bool = False
     results: list[SymbolResult] = field(default_factory=list)
 
     def snapshot(self) -> dict:
@@ -84,14 +79,13 @@ class SyncRunner:
         *,
         symbols: list[str] | None = None,
         full: bool = False,
-        periodic: bool = False,
     ) -> bool:
         """Begin a run in a worker thread. False when one is already running."""
         if not self._lock.acquire(blocking=False):
             return False
         thread = threading.Thread(
             target=self._run_and_release,
-            kwargs={"symbols": symbols, "full": full, "periodic": periodic},
+            kwargs={"symbols": symbols, "full": full},
             daemon=True,
         )
         thread.start()
@@ -108,7 +102,6 @@ class SyncRunner:
         *,
         symbols: list[str] | None = None,
         full: bool = False,
-        periodic: bool = False,
     ) -> SyncProgress:
         store.init_db(self._db_path)
 
@@ -123,7 +116,6 @@ class SyncRunner:
                 started_utc=_now_iso(),
                 total=len(catalog),
                 full=full,
-                periodic=periodic,
                 results=[SymbolResult(ticker=s.ticker) for s in catalog],
             )
 
@@ -132,7 +124,7 @@ class SyncRunner:
                 self._progress.current = instrument.ticker
             result = self._progress.results[index]
             try:
-                self._sync_symbol(instrument, full=full, periodic=periodic, result=result)
+                self._sync_symbol(instrument, full=full, result=result)
                 result.status = (
                     "error" if result.messages and not result.bars_written else "ok"
                 )
@@ -156,7 +148,6 @@ class SyncRunner:
         instrument: Instrument,
         *,
         full: bool,
-        periodic: bool,
         result: SymbolResult,
     ) -> None:
         now = datetime.now(UTC)
@@ -164,14 +155,6 @@ class SyncRunner:
         with store.connect(self._db_path) as conn:
             for tf_key in TIMEFRAME_ORDER:
                 tf = timeframe(tf_key)
-                if periodic and _cannot_have_a_new_bar(
-                    conn, instrument.ticker, tf_key, now=now
-                ):
-                    # Deliberately no record_sync: freshness must keep reflecting
-                    # the last run that actually fetched.
-                    result.skipped.append(tf_key)
-                    continue
-
                 start = _start_for(conn, instrument.ticker, tf_key, full=full, now=now)
 
                 outcome = fetch.fetch_bars(
@@ -244,20 +227,6 @@ def _start_for(conn, symbol: str, tf_key: str, *, full: bool, now: datetime) -> 
     return datetime.fromtimestamp(newest, UTC) - timedelta(
         seconds=OVERLAP_BARS * tf.seconds
     )
-
-
-def _cannot_have_a_new_bar(conn, symbol: str, tf_key: str, *, now: datetime) -> bool:
-    """Whether the source cannot yet hold a bar this series lacks.
-
-    Measured from the newest stored bar rather than the last sync timestamp: a
-    timeframe whose last attempt failed is exactly the one a retry should reach.
-    A timeframe holding nothing has no bar to measure against, so it never skips.
-    """
-    newest = store.last_ts(conn, symbol, tf_key)
-    if newest is None:
-        return False
-    elapsed = now - datetime.fromtimestamp(newest, UTC)
-    return elapsed < timedelta(seconds=timeframe(tf_key).seconds)
 
 
 def _now_iso() -> str:

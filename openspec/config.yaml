@@ -21,11 +21,9 @@ context: |
 
   Non-negotiable constraint carried over from the reference app: the app is
   offline-first by design. In the application — dev UI and published site —
-  data syncs only because the user asked for it: a sync control pressed, or a
-  periodic refresh the user switches on for the current session, which starts
-  off on every load and is never restored automatically. Do not propose
-  client-side scheduling, a refresh that runs without the user switching it on,
-  startup auto-sync, resuming a previously enabled refresh on a later load,
+  data syncs only because the user asked for it: a sync control pressed. Do not
+  propose client-side scheduling, a refresh that runs without the user pressing
+  a sync control, startup auto-sync,
   fetch-on-view, live streaming quotes, websockets, or any network call
   triggered merely by loading/viewing a chart. The single sanctioned exception
   is the release workflow's twice-daily CI schedule (03:00 and 15:00 UTC), which keeps the

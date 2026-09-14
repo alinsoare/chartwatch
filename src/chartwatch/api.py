@@ -37,9 +37,6 @@ class SyncRequest(BaseModel):
 
     symbols: list[str] | None = None
     full: bool = False
-    #: A periodic refresh skips timeframes that cannot yet have a new bar; a
-    #: manual run never does. The caller says which it is rather than us guessing.
-    periodic: bool = False
 
 
 @app.get("/data/meta.json")
@@ -86,9 +83,7 @@ def candles(symbol: str, timeframe: str) -> dict:
 
 @app.post("/api/sync")
 def start_sync(request: SyncRequest) -> dict:
-    started = runner.try_start(
-        symbols=request.symbols, full=request.full, periodic=request.periodic
-    )
+    started = runner.try_start(symbols=request.symbols, full=request.full)
     if not started:
         raise HTTPException(status_code=409, detail="a sync is already running")
     return {"started": True, "status": runner.snapshot()}

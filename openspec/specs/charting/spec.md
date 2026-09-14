@@ -414,7 +414,7 @@ Degenerate windows SHALL be defined rather than left to chance:
 
 ### Requirement: User settings persist across reloads
 
-The UI SHALL remember the user's settings on the same browser and restore them on the next load: the chart display limit, the automatic vertical scale control's state, the selected instrument, the selected timeframe, the enabled indicators, and the sidebar filters (search text, asset class, quote currency, exchange, compatible-only, enabled-only, sort order). Persistence SHALL be local to the browser and SHALL NOT travel with the exported data or be shared between browsers. Only these settings persist; transient chart state SHALL NOT — neither an in-progress or completed measurement, nor the current zoom and scroll position, which start from the default framing on every load, nor the particular price range the automatic vertical scale last derived, which is recomputed from whatever is visible after the restore. Neither SHALL the sync controls' own state — the full-refresh option and the periodic-refresh control both start off on every load, so a reload can never resume fetching. A stored setting that is unusable — an instrument no longer in the catalog, an unknown timeframe, an unparseable limit, a non-boolean automatic-scale state, an unknown sort order, an asset class, quote currency or exchange no longer carried by any loaded instrument — SHALL be replaced by its default without blocking the rest of the restore. A browser holding settings written before the automatic vertical scale existed SHALL restore that control to its default of off, keeping its other settings, without a migration step and without an error. A sort order the list no longer offers SHALL be treated as unknown, so a browser holding the withdrawn sync-recency order restores the default order and keeps its other settings, without a migration step and without an error. A timeframe the system no longer supports SHALL likewise be treated as unknown, so a browser holding a withdrawn timeframe restores the default timeframe and keeps its other settings, again without a migration step and without an error. Restoring a filter SHALL NOT be able to hide the whole catalog behind a value the user cannot see in the filter's own choices. Where the browser denies persistent storage, the app SHALL operate normally with default settings.
+The UI SHALL remember the user's settings on the same browser and restore them on the next load: the chart display limit, the automatic vertical scale control's state, the selected instrument, the selected timeframe, the enabled indicators, and the sidebar filters (search text, asset class, quote currency, exchange, compatible-only, enabled-only, sort order). Persistence SHALL be local to the browser and SHALL NOT travel with the exported data or be shared between browsers. Only these settings persist; transient chart state SHALL NOT — neither an in-progress or completed measurement, nor the current zoom and scroll position, which start from the default framing on every load, nor the particular price range the automatic vertical scale last derived, which is recomputed from whatever is visible after the restore. Neither SHALL the sync controls' own state — the full-refresh option starts off on every load, so a reload can never resume fetching. A stored setting that is unusable — an instrument no longer in the catalog, an unknown timeframe, an unparseable limit, a non-boolean automatic-scale state, an unknown sort order, an asset class, quote currency or exchange no longer carried by any loaded instrument — SHALL be replaced by its default without blocking the rest of the restore. A browser holding settings written before the automatic vertical scale existed SHALL restore that control to its default of off, keeping its other settings, without a migration step and without an error. A sort order the list no longer offers SHALL be treated as unknown, so a browser holding the withdrawn sync-recency order restores the default order and keeps its other settings, without a migration step and without an error. A timeframe the system no longer supports SHALL likewise be treated as unknown, so a browser holding a withdrawn timeframe restores the default timeframe and keeps its other settings, again without a migration step and without an error. Restoring a filter SHALL NOT be able to hide the whole catalog behind a value the user cannot see in the filter's own choices. Where the browser denies persistent storage, the app SHALL operate normally with default settings.
 
 #### Scenario: Settings survive a reload
 
@@ -523,19 +523,14 @@ Compatibility warnings for the selected instrument SHALL be visible next to the 
 - **WHEN** the user selects an instrument flagged as a CFD
 - **THEN** a CFD badge appears in the chart header while the chart renders normally
 
-### Requirement: Sync controls in the UI
+### Requirement: Manual sync controls in the UI
 
-When a backend is available, the UI SHALL offer sync-all, sync-selected, a full-refresh option, and a periodic-refresh control, with a progress display while a run is active. These controls SHALL be the only way the UI causes market data to be fetched.
+When a backend is available, the UI SHALL offer sync-all, sync-selected, and a full-refresh option, with a progress display while a run is active. These controls SHALL be the only way the UI causes market data to be fetched.
 
 #### Scenario: Sync from the chart
 
 - **WHEN** the user presses sync-selected with an instrument chosen
 - **THEN** a sync starts for that instrument, progress is shown until completion, and the list and chart refresh from local storage afterwards
-
-#### Scenario: Periodic refresh is presented as a sync control
-
-- **WHEN** the sync controls are shown
-- **THEN** the periodic-refresh control appears among them, off, and its state is visible while it is on
 
 ### Requirement: The frontend runs with or without a backend
 

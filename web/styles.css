@@ -216,8 +216,6 @@ button:disabled { opacity: 0.45; cursor: default; }
 #display-limit:focus { outline: 1px solid var(--accent); }
 
 /* A running timer is easy to forget about; make "on" read at a glance. */
-#periodic-refresh-control.on { color: var(--accent); }
-
 #sync-progress {
   display: flex;
   align-items: center;

@@ -222,19 +222,7 @@ class TestSyncEndpoints:
             "/api/sync", json={"symbols": ["ABEA.DE"], "full": True}
         )
         assert response.status_code == 200
-        assert seen == {"symbols": ["ABEA.DE"], "full": True, "periodic": False}
-
-    def test_periodic_flag_reaches_the_runner(self, client, monkeypatch):
-        seen = {}
-        monkeypatch.setattr(api.runner, "try_start", lambda **kw: (seen.update(kw), True)[1])
-        monkeypatch.setattr(api.runner, "snapshot", lambda: {"running": True})
-
-        response = client.post("/api/sync", json={"periodic": True})
-        assert response.status_code == 200
-        # Carried explicitly rather than inferred: the runner must not have to
-        # guess whether the skip rule applies.
-        assert seen["periodic"] is True
-        assert seen["full"] is False
+        assert seen == {"symbols": ["ABEA.DE"], "full": True}
 
     def test_a_request_carrying_targets_is_refused(self, client, monkeypatch):
         def forbidden(**kwargs):

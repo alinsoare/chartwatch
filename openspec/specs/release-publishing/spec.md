@@ -98,7 +98,7 @@ The release workflow SHALL restore the data snapshot committed by the previous r
 
 ### Requirement: The published site is a passive snapshot
 
-The published GitHub Pages site SHALL make no requests to the market data source and SHALL offer no sync capability, including no periodic-refresh control. It SHALL display when its data snapshot was generated so the user knows how fresh it is.
+The published GitHub Pages site SHALL make no requests to the market data source and SHALL offer no sync capability. It SHALL display when its data snapshot was generated so the user knows how fresh it is.
 
 #### Scenario: Browsing the published site
 
@@ -108,7 +108,7 @@ The published GitHub Pages site SHALL make no requests to the market data source
 #### Scenario: No refresh control on the published site
 
 - **WHEN** a user looks for a way to update the data on the Pages site
-- **THEN** neither a sync control nor a periodic-refresh control is present, and the snapshot timestamp is the only indication of data age
+- **THEN** no sync control is present, and the snapshot timestamp is the only indication of data age
 
 ### Requirement: Development and release channels are separate
 
