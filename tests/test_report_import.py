@@ -175,6 +175,7 @@ class TestSuffixMapping:
             ("LYXIB.ES", "LYXIB.MC", "BME Madrid", "EUR"),
             ("SALM.NO", "SALM.OL", "Oslo Børs", "NOK"),
             ("SAABB.SE", "SAABB.ST", "Nasdaq Stockholm", "SEK"),
+            ("TSLA.DE", "TL0.DE", "XETRA", "EUR"),
         ],
     )
     def test_new_suffixes(self, ticker, yahoo, exchange, currency):
@@ -374,14 +375,14 @@ class TestCollection:
         missing = missing_instruments(collected, load_catalog_symbols(seed_catalog))
         tickers = {inst.ticker for inst in missing}
         assert len(collected.instruments) == 41
-        assert len(tickers) == 39
+        assert len(tickers) == 38
         assert tickers == {
             "2B76.DE", "2B79.DE", "2B7C.DE", "3USL.UK", "4MMR.DE", "A1P0.DE", "AAKI.DE",
             "ASWC.DE", "BLC.FR", "BTCE.DE", "C8PX.DE", "CA.FR", "CBUK.DE", "CD91.DE",
             "COPX.UK", "DFNC.DE", "DRON.DE", "ED3F.DE", "EEMU.FR", "ETLX.DE", "FTGA.DE",
             "FVSJ.DE", "H4ZP.DE", "IBCJ.DE", "ICNT.DE", "IS0E.DE", "ISAE.NL", "JMLP.DE",
             "LHTC.DE", "LI7U.DE", "NESTE.FI", "OOEA.DE", "S5SD.DE", "SPYN.DE", "SXR2.DE",
-            "TSLA.DE", "V.US", "V9N.DE", "WTEH.DE",
+            "V.US", "V9N.DE", "WTEH.DE",
         }
         assert {"S0LR.DE", "XAD6.DE"}.isdisjoint(tickers)
 
@@ -448,7 +449,6 @@ class TestCollection:
             "SX6PEX.DE",
             "SX7PEX.DE",
             "SXEPEX.DE",
-            "TSLA.DE",
             "VAN.DE",
             "XMIB.DE",
         }

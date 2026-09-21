@@ -24,6 +24,11 @@ PRICE_HEADERS = frozenset(
     {"Open Price", "Close Price", "Current price", "Open price", "Value"}
 )
 
+#: Broker-reported root -> Yahoo Finance root (suffix unchanged).
+YAHOO_ROOT_OVERRIDES: dict[str, str] = {
+    "TSLA": "TL0",
+}
+
 #: Broker-reported suffix -> (exchange, quote currency, Yahoo suffix)
 SUFFIX_MAP: dict[str, tuple[str, str, str]] = {
     ".DE": ("XETRA", "EUR", ".DE"),
@@ -191,7 +196,7 @@ def guess_yahoo_symbol(ticker: str) -> str:
     if suffix is None:
         return ticker
     exchange, _currency, yahoo_suffix = SUFFIX_MAP[suffix]
-    root = ticker[: -len(suffix)]
+    root = YAHOO_ROOT_OVERRIDES.get(ticker[: -len(suffix)], ticker[: -len(suffix)])
     if suffix == ".US":
         return root
     return f"{root}{yahoo_suffix}"
