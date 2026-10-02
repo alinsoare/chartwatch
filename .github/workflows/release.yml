@@ -53,7 +53,11 @@ jobs:
         run: |
           if git fetch origin data 2>/dev/null; then
             mkdir -p data
-            git cat-file blob FETCH_HEAD:market.db > data/market.db
+            if git cat-file -e FETCH_HEAD:market.db.zst 2>/dev/null; then
+              git cat-file blob FETCH_HEAD:market.db.zst | zstd -q -d -f -o data/market.db
+            else
+              git cat-file blob FETCH_HEAD:market.db > data/market.db
+            fi
             echo "restored snapshot from data branch"
           else
             echo "no data branch yet - first release does the full backfill"
@@ -72,10 +76,12 @@ jobs:
 
       - name: Persist the snapshot as a replace commit on the data branch
         # A fresh root commit each release keeps exactly one binary snapshot
-        # in the branch history instead of accumulating them forever.
+        # in the branch history instead of accumulating them forever. The
+        # database is zstd-compressed because GitHub rejects files over 100 MB.
         run: |
-          blob=$(git hash-object -w data/market.db)
-          tree=$(printf '100644 blob %s\tmarket.db\n' "$blob" | git mktree)
+          zstd -q -f -12 -T0 data/market.db -o market.db.zst
+          blob=$(git hash-object -w market.db.zst)
+          tree=$(printf '100644 blob %s\tmarket.db.zst\n' "$blob" | git mktree)
           commit=$(GIT_AUTHOR_NAME=github-actions GIT_AUTHOR_EMAIL=actions@github.com \
                    GIT_COMMITTER_NAME=github-actions GIT_COMMITTER_EMAIL=actions@github.com \
                    git commit-tree "$tree" -m "data snapshot $(date -u +%FT%TZ)")

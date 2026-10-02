@@ -238,16 +238,18 @@ The workflow restores whatever the `data` branch holds, so the next dispatch
 picks up from your snapshot and syncs incrementally on top of it.
 
 The branch layout is a contract: `data` is a single root commit whose tree
-holds exactly one file, `market.db`, **at the root** — not under `data/`.
-Committing it the ordinary way (`git add data/market.db`) puts the blob at the
+holds exactly one file, `market.db.zst` (the zstd-compressed database),
+**at the root** — not under `data/`. It is compressed because GitHub rejects
+any file over 100 MB. Committing it the ordinary way puts the blob at the
 wrong path, and the workflow's restore step then finds nothing and falls back
 to a full backfill. These commands write it the way CI does, without touching
-your working tree, branches, or `HEAD`:
+your branches or `HEAD`:
 
 ```bash
 uv run chartwatch sync           # refresh data/market.db locally first
-blob=$(git hash-object -w data/market.db)
-tree=$(printf '100644 blob %s\tmarket.db\n' "$blob" | git mktree)
+zstd -q -f -12 -T0 data/market.db -o /tmp/market.db.zst
+blob=$(git hash-object -w /tmp/market.db.zst)
+tree=$(printf '100644 blob %s\tmarket.db.zst\n' "$blob" | git mktree)
 commit=$(git commit-tree "$tree" -m "data snapshot $(date -u +%FT%TZ)")
 git push --force origin "$commit:refs/heads/data"
 ```
@@ -261,7 +263,7 @@ To go the other way and inspect the snapshot CI produced:
 
 ```bash
 git fetch origin data
-git cat-file blob FETCH_HEAD:market.db > data/market.db
+git cat-file blob FETCH_HEAD:market.db.zst | zstd -d -f -o data/market.db
 ```
 
 ## Adding a symbol
