@@ -29,6 +29,13 @@ YAHOO_ROOT_OVERRIDES: dict[str, str] = {
     "TSLA": "TL0",
 }
 
+#: Broker-reported ticker -> Yahoo Finance ticker (when suffix mapping is not enough).
+YAHOO_SYMBOL_OVERRIDES: dict[str, str] = {
+    "BLC.FR": "BLC.PA",
+    "C7A0.DE": "C7A0.DU",
+    "EEMU.FR": "EEMU.PA",
+}
+
 #: Broker-reported suffix -> (exchange, quote currency, Yahoo suffix)
 SUFFIX_MAP: dict[str, tuple[str, str, str]] = {
     ".DE": ("XETRA", "EUR", ".DE"),
@@ -192,6 +199,9 @@ def point_size_from_decimals(decimals: int) -> float:
 
 
 def guess_yahoo_symbol(ticker: str) -> str:
+    override = YAHOO_SYMBOL_OVERRIDES.get(ticker)
+    if override is not None:
+        return override
     suffix = _suffix_for(ticker)
     if suffix is None:
         return ticker

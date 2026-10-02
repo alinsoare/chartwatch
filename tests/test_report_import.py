@@ -176,6 +176,9 @@ class TestSuffixMapping:
             ("SALM.NO", "SALM.OL", "Oslo Børs", "NOK"),
             ("SAABB.SE", "SAABB.ST", "Nasdaq Stockholm", "SEK"),
             ("TSLA.DE", "TL0.DE", "XETRA", "EUR"),
+            ("BLC.FR", "BLC.PA", "Euronext Paris", "EUR"),
+            ("C7A0.DE", "C7A0.DU", "XETRA", "EUR"),
+            ("EEMU.FR", "EEMU.PA", "Euronext Paris", "EUR"),
         ],
     )
     def test_new_suffixes(self, ticker, yahoo, exchange, currency):
@@ -278,7 +281,6 @@ class TestShortlists:
             "AJI.DE",
             "ASI1.DE",
             "ASM.NL",
-            "C7A0.DE",
             "CANEUA.DE",
             "HIA1.DE",
             "HOT.DE",
@@ -434,7 +436,6 @@ class TestCollection:
             "AJI.DE",
             "ASI1.DE",
             "ASM.NL",
-            "C7A0.DE",
             "CANEUA.DE",
             "HIA1.DE",
             "HOT.DE",

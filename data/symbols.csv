@@ -14,17 +14,17 @@ AAPL,Apple Inc CFD,Apple Inc.,STOCK,CFD,NASDAQ,USD,0.01,1,true
 A1P0.DE,Defiance AI & Power Infrastructure ETF,Defiance AI & Power Infrastructure ETF USD Acc,ETF,REAL,XETRA,EUR,0.001,1,true
 AAKI.DE,ARK Artificial Intelligence & Robotics UCITS ETF,ARK Artificial Intelligence & Robotics UCITS ETF Class A USD Accumulation,ETF,REAL,XETRA,EUR,0.001,1,true
 ASWC.DE,HANetf Future of Defence UCITS ETF Acc,Future of Defence UCITS ETF,ETF,REAL,XETRA,EUR,0.001,1,true
-BLC.PA,Bastide Le Confort Medical SA,Bastide Le Confort Medical SA,STOCK,REAL,Euronext Paris,EUR,0.01,1,true
+BLC.PA,Bastide le Confort Medical,Bastide Le Confort Medical SA,STOCK,REAL,Euronext Paris,EUR,0.01,1,true
 BTCE.DE,Bitwise Physical Bitcoin ETC,Bitwise Physical Bitcoin ETC,ETC,REAL,XETRA,EUR,0.0001,1,true
 C8PX.DE,Global X AI Semiconductor & Quantum UCITS ETF,Global X AI Semiconductor & Quantum UCITS ETF USD Acc,ETF,REAL,XETRA,EUR,0.001,1,true
 CA.PA,Carrefour SA,Carrefour SA,STOCK,REAL,Euronext Paris,EUR,0.001,1,true
 CBUK.DE,iShares MSCI China Tech UCITS ETF,iShares MSCI China Tech UCITS ETF,ETF,REAL,XETRA,EUR,0.001,1,true
 CD91.DE,Amundi Gold Miners UCITS ETF,Amundi Index Solutions - Amundi Gold Miners UCITS ETF USD Distributing,ETF,REAL,XETRA,EUR,0.01,1,true
 COPX.L,Global X Copper Miners UCITS ETF,Global X Copper Miners UCITS ETF USD Acc,ETF,REAL,London Stock Exchange,USD,0.01,1,true
-DFNC.DE,iShares Europe Defence UCITS ETF,iShares VII PLC - iShares Europe Defence UCITS ETF EUR (Acc),ETF,REAL,XETRA,EUR,0.001,1,true
-DRON.DE,Defiance Drone UCITS ETF,Defiance Drone UCITS ETF Accumulating Share Class USD Acc,ETF,REAL,XETRA,EUR,0.001,1,true
+DFNC.DE,Europe Defence,iShares VII PLC - iShares Europe Defence UCITS ETF EUR (Acc),ETF,REAL,XETRA,EUR,0.001,1,true
+DRON.DE,Drone,Defiance Drone UCITS ETF Accumulating Share Class USD Acc,ETF,REAL,XETRA,EUR,0.001,1,true
 ED3F.DE,Global X Europe Focused Defence Tech UCITS ETF,Global X Europe Focused Defence Tech UCITS ETF EUR Accumulating,ETF,REAL,XETRA,EUR,0.001,1,true
-EEMU.PA,BNP Paribas Easy MSCI EMU Min TE UCITS ETF,BNP Paribas Easy MSCI EMU Min TE UCITS ETF – EUR,ETF,REAL,Euronext Paris,EUR,0.001,1,true
+EEMU.PA,MSCI EMU Min TE,BNP Paribas Easy MSCI EMU Min TE UCITS ETF – EUR,ETF,REAL,Euronext Paris,EUR,0.001,1,true
 ETLX.DE,L&G Gold Mining UCITS ETF,L&G Gold Mining UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
 FTGA.DE,First Trust Global Aerospace & Defence UCITS ETF,First Trust Indxx Global Aerospace & Defence UCITS ETF Class A USD Acc,ETF,REAL,XETRA,EUR,0.001,1,true
 FVSJ.DE,Franklin FTSE Asia ex China ex Japan UCITS ETF,Franklin FTSE Asia ex China ex Japan UCITS ETF,ETF,REAL,XETRA,EUR,0.001,1,true
@@ -71,7 +71,7 @@ AJI.F,Ajinomoto Co Inc,"Ajinomoto Co., Inc.",STOCK,REAL,XETRA,EUR,0.01,1,true
 ARGX.BR,Argenx SE,argenx SE,STOCK,REAL,Euronext Brussels,EUR,0.01,1,true
 ASI1.F,Asics Corp,ASICS Corporation,STOCK,REAL,XETRA,EUR,0.01,1,true
 BNKE.PA,Amundi Euro Stoxx Banks UCITS ETF (Acc EUR),Amundi Euro Stoxx Banks UCITS ETF Acc,ETF,REAL,Euronext Paris,EUR,0.01,1,true
-300750.SZ,Contemporary Amperex Technology Co Ltd,"Contemporary Amperex Technology Co., Limited",STOCK,REAL,XETRA,CNY,0.01,1,true
+C7A0.DU,Contemporary Amperex Technology,"Contemporary Amperex Technology Co., Limited",STOCK,REAL,XETRA,EUR,0.01,1,true
 CBRS.DE,First Trust Nasdaq Cybersecurity UCITS (Acc EUR),First Trust Nasdaq Cybersecurity UCITS ETF Class A USD Accumulation,ETF,REAL,XETRA,EUR,0.01,1,true
 D500.DE,"Invesco S&P 500 UCITS (Dist, EUR)",Invesco S&P 500 UCITS ETF (Dist),ETF,REAL,XETRA,EUR,0.01,1,true
 D5BH.DE,"Xtrackers MSCI Canada ESG Screened UCITS (Acc, EUR)",Xtrackers MSCI Canada Screened UCITS ETF 1C,ETF,REAL,XETRA,EUR,0.01,1,true
@@ -132,7 +132,6 @@ ZPDE.DE,"SPDR S&P US Energy Select Sector UCITS (Acc, EUR)",State Street SPDR S&
 ZPDI.DE,"SPDR S&P US Industrial Select Sector UCITS (Acc, EUR)",State Street SPDR S&P U.S. Industrials Select Sector UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
 ZPDT.DE,"SPDR S&P US Technology Select Sector UCITS (Acc, EUR)",State Street SPDR S&P U.S. Technology Select Sector UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
 AMZ.DE,Amazon,Amazon.com Inc.,STOCK,REAL,XETRA,EUR,0.01,1,true
-C7A0.F,Contemporary Amperex Technology,Contemporary Amperex Technology Co. Limited,STOCK,REAL,Frankfurt,EUR,0.01,1,true
 EGAS.L,European Natural Gas,WisdomTree European Natural Gas ETP,ETC,REAL,London Stock Exchange,GBP,0.01,1,true
 ESIE.DE,MSCI Europe Energy Sector,iShares MSCI Europe Energy Sector UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
 ESIH.DE,MSCI Europe Health Care Sector,iShares MSCI Europe Health Care Sector UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
