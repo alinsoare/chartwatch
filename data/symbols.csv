@@ -37,7 +37,7 @@ JMLP.DE,Alerian Midstream Energy Dividend UCITS ETF,Alerian Midstream Energy Div
 LHTC.DE,Amundi STOXX Europe 600 Healthcare UCITS ETF,Lyxor Index Fund - Lyxor Stoxx Europe 600 Healthcare UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
 LI7U.DE,Global X Lithium & Battery Tech UCITS ETF,Global X Lithium & Battery Tech UCITS ETF,ETF,REAL,XETRA,EUR,0.001,1,true
 NESTE.HE,Neste Oyj,Neste Oyj,STOCK,REAL,Nasdaq Helsinki,EUR,0.01,1,true
-BRNT.L,WisdomTree Brent Crude Oil ETC,WisdomTree Brent Crude Oil,ETC,REAL,XETRA,USD,0.001,1,false
+BRNT.L,WisdomTree Brent Crude Oil ETC,WisdomTree Brent Crude Oil,ETC,REAL,London Stock Exchange,USD,0.001,1,true
 S5SD.DE,UBS S&P 500 Scored & Screened UCITS ETF,UBS S&P 500 Scored & Screened UCITS ETF USD dis,ETF,REAL,XETRA,EUR,0.001,1,true
 SPYN.DE,SPDR MSCI Europe Energy UCITS ETF,State Street SPDR MSCI Europe Energy UCITS ETF,ETF,REAL,XETRA,EUR,0.1,1,true
 SXR2.DE,iShares MSCI Canada UCITS ETF,iShares VII PLC - iShares MSCI Canada ETF USD Acc,ETF,REAL,XETRA,EUR,0.1,1,true
@@ -131,3 +131,26 @@ XUTC.DE,"Xtrackers MSCI USA Information Tech UCITS 1D (Dist, EUR)",Xtrackers MSC
 ZPDE.DE,"SPDR S&P US Energy Select Sector UCITS (Acc, EUR)",State Street SPDR S&P U.S. Energy Select Sector UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
 ZPDI.DE,"SPDR S&P US Industrial Select Sector UCITS (Acc, EUR)",State Street SPDR S&P U.S. Industrials Select Sector UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
 ZPDT.DE,"SPDR S&P US Technology Select Sector UCITS (Acc, EUR)",State Street SPDR S&P U.S. Technology Select Sector UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
+AMZ.DE,Amazon,Amazon.com Inc.,STOCK,REAL,XETRA,EUR,0.01,1,true
+C7A0.F,Contemporary Amperex Technology,Contemporary Amperex Technology Co. Limited,STOCK,REAL,Frankfurt,EUR,0.01,1,true
+EGAS.L,European Natural Gas,WisdomTree European Natural Gas ETP,ETC,REAL,London Stock Exchange,GBP,0.01,1,true
+ESIE.DE,MSCI Europe Energy Sector,iShares MSCI Europe Energy Sector UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
+ESIH.DE,MSCI Europe Health Care Sector,iShares MSCI Europe Health Care Sector UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
+EVSD.DE,European Superdividend,Global X European SuperDividend UCITS ETF EUR Dist,ETF,REAL,XETRA,EUR,0.01,1,true
+FXAC.AS,China Large Cap,Franklin FTSE China UCITS ETF,ETF,REAL,Euronext Amsterdam,EUR,0.01,1,true
+H4ZE.DE,MSCI Europe,HSBC MSCI Europe UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
+IART.DE,AI Innovation Active,iShares AI Innovation Active UCITS ETF USD Acc,ETF,REAL,XETRA,EUR,0.01,1,true
+IQQA.DE,Euro Dividend,iShares Euro Dividend UCITS ETF EUR Dist,ETF,REAL,XETRA,EUR,0.01,1,true
+IVCS.DE,Cybersecurity,Invesco Cybersecurity UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
+JNHD.DE,MSCI Japan,iShares MSCI Japan UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
+PTC,PTC,PTC Inc.,STOCK,REAL,NASDAQ,USD,0.01,1,true
+URNU.DE,Uranium,Global X Uranium UCITS ETF USD Acc,ETF,REAL,XETRA,EUR,0.01,1,true
+VGEK.DE,FTSE Developed Asia Pacific ex Japan,Vanguard FTSE Developed Asia Pacific ex Japan UCITS ETF USD Acc,ETF,REAL,XETRA,EUR,0.01,1,true
+ALI=F,Aluminum Futures,Aluminum futures,COMMODITY,CFD,COMEX,USD,0.01,1,true
+CL=F,Crude Oil Futures,Crude Oil futures,COMMODITY,CFD,NYMEX,USD,0.01,1,true
+GC=F,Gold Futures,Gold futures,COMMODITY,CFD,COMEX,USD,0.01,1,true
+NG=F,Natural Gas Futures,Natural Gas futures,COMMODITY,CFD,NYMEX,USD,0.001,1,true
+SI=F,Silver Futures,Silver futures,COMMODITY,CFD,COMEX,USD,0.01,1,true
+^GDAXI,DAX Performance Index,DAX Performance Index,INDEX,CFD,XETRA,EUR,0.01,1,true
+^GSPC,S&P 500 Index,S&P 500 Index,INDEX,CFD,CME,USD,0.01,1,true
+^STOXX50E,EURO STOXX 50 Index,EURO STOXX 50 Index,INDEX,CFD,STOXX,EUR,0.01,1,true
