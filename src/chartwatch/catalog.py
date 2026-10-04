@@ -38,6 +38,8 @@ class Instrument:
     point_size: float
     price_divisor: float
     enabled: bool
+    #: Other tickers (e.g. the broker's listing) that serve this instrument's data.
+    aliases: tuple[str, ...] = ()
 
     @property
     def is_cfd(self) -> bool:
@@ -106,6 +108,9 @@ def load_catalog(path: Path | None = None) -> list[Instrument]:
                 raise ValueError(
                     f"{path}:{line}: point_size and price_divisor must be positive"
                 )
+            aliases = tuple(
+                a for a in (row.get("aliases") or "").replace(";", " ").split() if a
+            )
             instruments.append(
                 Instrument(
                     ticker=ticker,
@@ -118,8 +123,19 @@ def load_catalog(path: Path | None = None) -> list[Instrument]:
                     point_size=point_size,
                     price_divisor=price_divisor,
                     enabled=(row["enabled"] or "").strip().lower() in ("true", "1", "yes"),
+                    aliases=aliases,
                 )
             )
+
+    claimed = {i.ticker: i.ticker for i in instruments}
+    for instrument in instruments:
+        for alias in instrument.aliases:
+            if alias in claimed:
+                raise ValueError(
+                    f"{path}: alias {alias!r} of {instrument.ticker!r} "
+                    f"is already used by {claimed[alias]!r}"
+                )
+            claimed[alias] = instrument.ticker
     return instruments
 
 
@@ -130,3 +146,11 @@ def enabled_instruments(instruments: list[Instrument]) -> list[Instrument]:
 
 def by_ticker(instruments: list[Instrument]) -> dict[str, Instrument]:
     return {i.ticker: i for i in instruments}
+
+
+def resolve(instruments: list[Instrument], symbol: str) -> Instrument | None:
+    """The instrument whose ticker or one of whose aliases is ``symbol``."""
+    for instrument in instruments:
+        if symbol == instrument.ticker or symbol in instrument.aliases:
+            return instrument
+    return None

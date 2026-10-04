@@ -22,7 +22,7 @@ def scan_cache_version() -> int:
 
 
 @pytest.fixture
-def client(monkeypatch, tmp_path):
+def client(monkeypatch, tmp_path, fixture_catalog):
     db = tmp_path / "market.db"
     monkeypatch.setattr(store, "DB_PATH", db)
     store.init_db(db)
@@ -97,6 +97,15 @@ def test_export_round_trip(client, tmp_path):
             exported = json.loads(path.read_text())
             dev = client.get(f"/data/candles/{symbol}/{tf_key}.json").json()
             assert exported == dev
+
+    # Aliases get their own candle files carrying the catalogued ticker's bars.
+    for entry in exported_catalog["symbols"]:
+        for alias in entry["aliases"]:
+            for tf_key in TIMEFRAME_ORDER:
+                alias_path = out / "data" / "candles" / alias / f"{tf_key}.json"
+                ticker_path = out / "data" / "candles" / entry["ticker"] / f"{tf_key}.json"
+                assert alias_path.read_text() == ticker_path.read_text()
+    assert (out / "data" / "candles" / "C7A0.DE" / "d1.json").exists()
 
     # The seeded bars actually round-tripped.
     abea = json.loads((out / "data" / "candles" / "ABEA.DE" / "h1.json").read_text())

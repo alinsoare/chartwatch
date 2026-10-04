@@ -8,7 +8,12 @@ Defines the hand-curated instrument list the app charts, the catalog schema (`ti
 
 ### Requirement: Catalog is the single source of truth for instruments
 
-The system SHALL define all instruments in a single hand-maintained catalog file. Each entry SHALL carry at minimum: the Yahoo Finance ticker, a human-readable display name, asset class, instrument type, exchange, expected quote currency, point size, an optional price divisor, and an enabled flag. The ticker SHALL be the catalog's sole identifier for an instrument: it is used both to key stored data and to query the market data source, and no separate broker-specific symbol SHALL be carried alongside it. No other part of the system SHALL define or hardcode instruments.
+The system SHALL define all instruments in a single hand-maintained catalog file. Each entry SHALL carry at minimum: the Yahoo Finance ticker, a human-readable display name, asset class, instrument type, exchange, expected quote currency, point size, an optional price divisor, and an enabled flag. The ticker SHALL be the catalog's primary identifier for an instrument: it is used both to key stored data and to query the market data source. An entry MAY list aliases — other tickers, such as the broker's listing of the same instrument when the data source does not carry it — under which the same data is served; an alias SHALL NOT repeat any catalog ticker or another entry's alias, and SHALL NOT be stored, synced, or queried at the data source in its own right. No other part of the system SHALL define or hardcode instruments.
+
+#### Scenario: Requesting data by an alias
+
+- **WHEN** a client requests candles for a ticker listed as an alias of a catalog entry
+- **THEN** it receives that entry's candles, both from the dev server and from the static export
 
 #### Scenario: Adding an instrument
 

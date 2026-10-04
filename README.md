@@ -300,6 +300,11 @@ enabling it — broker-reported and Yahoo tickers differ in exchange suffix
 root (`TSLA.DE` is `TL0.DE` on Yahoo). Set `instrument_type` to `CFD` or
 `REAL` explicitly; CFD classification reads that field, not the display name.
 
+When the broker's listing has no Yahoo data but another venue does, put the
+working Yahoo ticker in `ticker` and the broker's ticker in `aliases`
+(space- or `;`-separated). `data/candles/<alias>/<tf>.json` then serves the
+same bars, in dev and in the static export — e.g. `C7A0.DE` serves `C7A0.DU`.
+
 `point_size` should be the instrument's real tick size, because it sets how many
 decimals the chart shows: `0.01` gives two, `0.00001` gives five, everywhere a
 price appears (price scale, crosshair, OHLC legend, ruler readout). Claiming a

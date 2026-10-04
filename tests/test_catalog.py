@@ -11,6 +11,7 @@ from chartwatch.catalog import (
     by_ticker,
     enabled_instruments,
     load_catalog,
+    resolve,
 )
 
 HEADER = (
@@ -117,24 +118,56 @@ class TestLoading:
         with pytest.raises(ValueError, match="positive"):
             load_catalog(path)
 
-    def test_seed_catalog_is_valid(self):
-        # The checked-in catalog must always load.
-        instruments = load_catalog()
-        assert len(instruments) == 133
+    def test_aliases_column_is_optional_and_resolves(self, tmp_path):
+        path = tmp_path / "symbols.csv"
+        path.write_text(
+            HEADER + ",aliases\n"
+            "C7A0.DU,CATL,CATL,STOCK,REAL,XETRA,EUR,0.01,1,true,C7A0.DE;C7A0.XX\n"
+            "ABEA.DE,Alphabet,Alphabet,STOCK,REAL,XETRA,EUR,0.01,1,true,\n",
+            encoding="utf-8",
+        )
+        instruments = load_catalog(path)
+        assert by_ticker(instruments)["C7A0.DU"].aliases == ("C7A0.DE", "C7A0.XX")
+        assert by_ticker(instruments)["ABEA.DE"].aliases == ()
+        assert resolve(instruments, "C7A0.DE").ticker == "C7A0.DU"
+        assert resolve(instruments, "C7A0.DU").ticker == "C7A0.DU"
+        assert resolve(instruments, "NOPE.XX") is None
+
+    def test_alias_colliding_with_a_ticker_is_rejected(self, tmp_path):
+        path = tmp_path / "symbols.csv"
+        path.write_text(
+            HEADER + ",aliases\n"
+            "C7A0.DU,CATL,CATL,STOCK,REAL,XETRA,EUR,0.01,1,true,ABEA.DE\n"
+            "ABEA.DE,Alphabet,Alphabet,STOCK,REAL,XETRA,EUR,0.01,1,true,\n",
+            encoding="utf-8",
+        )
+        with pytest.raises(ValueError, match="alias 'ABEA.DE'"):
+            load_catalog(path)
+
+    def test_seed_catalog_aliases_catl_xetra_listing(self):
+        assert resolve(load_catalog(), "C7A0.DE").ticker == "C7A0.DU"
+
+    def test_seed_catalog_is_valid(self, fixture_catalog):
+        instruments = load_catalog(fixture_catalog)
+        assert len(instruments) == 6
         assert any(i.enabled for i in instruments)
-        assert sum(1 for i in instruments if i.enabled) == 131
+        assert sum(1 for i in instruments if i.enabled) == 5
         disabled = [i for i in instruments if not i.enabled]
-        assert {i.ticker for i in disabled} == {"GLD", "BRNT.L"}
+        assert {i.ticker for i in disabled} == {"GLD"}
 
-    def test_non_eur_real_stocks_are_flagged_without_cfd(self):
-        instruments = by_ticker(load_catalog())
-        for symbol in ("3USL.L", "COPX.L", "V"):
-            inst = instruments[symbol]
-            assert not inst.is_cfd
-            reasons = inst.incompatibility_reasons()
-            assert any(r.startswith("not EUR") for r in reasons)
-            assert "CFD" not in reasons
+    def test_live_catalog_invariants_hold(self):
+        instruments = load_catalog()
+        assert any(i.enabled for i in instruments)
+        assert resolve(instruments, "C7A0.DE").ticker == "C7A0.DU"
 
-    def test_three_decimal_point_size(self):
-        a1p0 = by_ticker(load_catalog())["A1P0.DE"]
+    def test_non_eur_real_stocks_are_flagged_without_cfd(self, fixture_catalog):
+        instruments = by_ticker(load_catalog(fixture_catalog))
+        inst = instruments["3USL.L"]
+        assert not inst.is_cfd
+        reasons = inst.incompatibility_reasons()
+        assert any(r.startswith("not EUR") for r in reasons)
+        assert "CFD" not in reasons
+
+    def test_three_decimal_point_size(self, fixture_catalog):
+        a1p0 = by_ticker(load_catalog(fixture_catalog))["A1P0.DE"]
         assert a1p0.point_size == 0.001

@@ -15,7 +15,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict
 
 from . import contract, screener_scores, store
-from .catalog import by_ticker, load_catalog
+from .catalog import load_catalog, resolve
 from .config import TIMEFRAME_ORDER, TIMEFRAMES, WEB_DIR
 from .sync import runner
 
@@ -75,10 +75,11 @@ def candles(symbol: str, timeframe: str) -> dict:
             status_code=400,
             detail=f"unknown timeframe {timeframe!r}, expected one of {TIMEFRAME_ORDER}",
         )
-    if symbol not in by_ticker(load_catalog()):
+    instrument = resolve(load_catalog(), symbol)
+    if instrument is None:
         raise HTTPException(status_code=404, detail=f"unknown symbol {symbol!r}")
     with store.connect() as conn:
-        return contract.build_candles(conn, symbol, timeframe)
+        return contract.build_candles(conn, instrument.ticker, timeframe)
 
 
 @app.post("/api/sync")

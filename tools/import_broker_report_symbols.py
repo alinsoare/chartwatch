@@ -239,11 +239,13 @@ def guess_catalog_fields(ticker: str, instrument: ReportInstrument) -> dict[str,
 def load_catalog_symbols(catalog_path: Path) -> set[str]:
     with open(catalog_path, newline="", encoding="utf-8") as handle:
         reader = csv.DictReader(handle)
-        return {
-            (row.get("ticker") or "").strip()
-            for row in reader
-            if (row.get("ticker") or "").strip()
-        }
+        symbols: set[str] = set()
+        for row in reader:
+            ticker = (row.get("ticker") or "").strip()
+            if ticker:
+                symbols.add(ticker)
+            symbols.update((row.get("aliases") or "").replace(";", " ").split())
+        return symbols
 
 
 def collect_from_shortlist(path: Path, collected: CollectedReport) -> None:

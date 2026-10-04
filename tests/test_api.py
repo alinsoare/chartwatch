@@ -14,7 +14,7 @@ from chartwatch.store import Bar
 
 
 @pytest.fixture
-def client(monkeypatch, tmp_path):
+def client(monkeypatch, tmp_path, fixture_catalog):
     """Test client against a temporary database and a fetch module that explodes.
 
     Patching fetch to raise proves no data endpoint touches the network.
@@ -68,14 +68,14 @@ class TestCatalog:
     def test_lists_seed_instruments_with_flags(self, client):
         payload = client.get("/data/catalog.json").json()
         by_symbol = {s["ticker"]: s for s in payload["symbols"]}
-        assert len(payload["symbols"]) == 133
+        assert len(payload["symbols"]) == 6
         assert "ABEA.DE" in by_symbol
-        for symbol in ("3USL.L", "COPX.L", "V"):
-            entry = by_symbol[symbol]
-            assert any(r.startswith("not EUR") for r in entry["incompatibility"])
-            assert "CFD" not in entry["incompatibility"]
 
-        aapl = by_symbol["AAPL"]  # enabled USD CFD in the seed catalog
+        entry = by_symbol["3USL.L"]
+        assert any(r.startswith("not EUR") for r in entry["incompatibility"])
+        assert "CFD" not in entry["incompatibility"]
+
+        aapl = by_symbol["AAPL"]  # enabled USD CFD in the fixture catalog
         assert not aapl["compatible"]
         assert "CFD" in aapl["incompatibility"]
         assert any(r.startswith("not EUR") for r in aapl["incompatibility"])
@@ -158,6 +158,12 @@ class TestCandles:
 
     def test_unknown_symbol_is_404(self, client):
         assert client.get("/data/candles/NOPE.XX/d1.json").status_code == 404
+
+    def test_alias_serves_the_catalogued_tickers_bars(self, client):
+        seed("C7A0.DU", "d1", 4)
+        payload = client.get("/data/candles/C7A0.DE/d1.json").json()
+        assert payload["symbol"] == "C7A0.DU"
+        assert len(payload["candles"]) == 4
 
 
 class TestRetiredTimeframeRows:

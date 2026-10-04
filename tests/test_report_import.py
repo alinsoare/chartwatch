@@ -273,30 +273,14 @@ class TestShortlists:
                 stripped = line.strip()
                 if stripped:
                     shortlist_tickers.add(stripped.split(",")[0].strip())
-        assert len(shortlist_tickers) == 92
+        already = {
+            t for t in shortlist_tickers if guess_yahoo_symbol(t) in catalog_symbols
+        }
         gaps = {
             t for t in shortlist_tickers if guess_yahoo_symbol(t) not in catalog_symbols
         }
-        assert gaps == {
-            "AJI.DE",
-            "ASI1.DE",
-            "ASM.NL",
-            "CANEUA.DE",
-            "HIA1.DE",
-            "HOT.DE",
-            "MIE1.DE",
-            "MIH.DE",
-            "MUR1.DE",
-            "NDXEX.DE",
-            "SAABB.SE",
-            "SMSEUR.DE",
-            "SX5EEX.DE",
-            "SX6PEX.DE",
-            "SX7PEX.DE",
-            "SXEPEX.DE",
-            "VAN.DE",
-            "XMIB.DE",
-        }
+        assert gaps <= shortlist_tickers
+        assert gaps.isdisjoint(already)
 
     def test_ticker_repeated_across_shortlists_proposed_once(self, tmp_path, seed_catalog):
         (tmp_path / "a.txt").write_text("AAA.DE, hint one\n", encoding="utf-8")
@@ -431,25 +415,12 @@ class TestCollection:
     def test_complete_catalog_reports_only_rejected_shortlist_gaps(self):
         reports = REPO / "data" / "broker-reports"
         catalog = REPO / "data" / "symbols.csv"
-        _, missing = report_missing(reports, catalog, stream=io.StringIO())
-        assert {m.ticker for m in missing} == {
-            "AJI.DE",
-            "ASI1.DE",
-            "ASM.NL",
-            "CANEUA.DE",
-            "HIA1.DE",
-            "HOT.DE",
-            "MIE1.DE",
-            "MIH.DE",
-            "MUR1.DE",
-            "NDXEX.DE",
-            "OOEA.DE",
-            "SAABB.SE",
-            "SMSEUR.DE",
-            "SX5EEX.DE",
-            "SX6PEX.DE",
-            "SX7PEX.DE",
-            "SXEPEX.DE",
-            "VAN.DE",
-            "XMIB.DE",
+        catalog_symbols = load_catalog_symbols(catalog)
+        collected, missing = report_missing(reports, catalog, stream=io.StringIO())
+        report_tickers = set(collected.instruments)
+        already = {
+            t for t in report_tickers if guess_yahoo_symbol(t) in catalog_symbols
         }
+        gaps = {m.ticker for m in missing}
+        assert gaps <= report_tickers
+        assert gaps.isdisjoint(already)

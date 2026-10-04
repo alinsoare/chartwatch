@@ -43,11 +43,12 @@ def export_site(out_dir: Path) -> int:
             screener_scores.build_screener_scores(catalog, scan_bars),
         )
         for instrument in instruments:
-            symbol_dir = data_dir / "candles" / instrument.ticker
-            symbol_dir.mkdir(parents=True, exist_ok=True)
             for tf_key in TIMEFRAME_ORDER:
                 payload = contract.build_candles(conn, instrument.ticker, tf_key)
-                written += _write_json(symbol_dir / f"{tf_key}.json", payload)
+                for symbol in (instrument.ticker, *instrument.aliases):
+                    symbol_dir = data_dir / "candles" / symbol
+                    symbol_dir.mkdir(parents=True, exist_ok=True)
+                    written += _write_json(symbol_dir / f"{tf_key}.json", payload)
 
     return written
 

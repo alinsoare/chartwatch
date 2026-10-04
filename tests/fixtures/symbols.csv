@@ -1,0 +1,7 @@
+ticker,display_name,name,asset_class,instrument_type,exchange,quote_currency,point_size,price_divisor,enabled,aliases
+ABEA.DE,Alphabet Inc - class A,Alphabet Inc.,STOCK,REAL,XETRA,EUR,0.01,1,true,
+GLD,SPDR Gold Shares CFD,Gold,ETF,CFD,NYSE Arca,USD,0.01,1,false,
+AAPL,Apple Inc CFD,Apple Inc.,STOCK,CFD,NASDAQ,USD,0.01,1,true,
+3USL.L,WisdomTree S&P 500 3x Daily Leveraged,WisdomTree S&P 500 3x Daily Leveraged,ETN,REAL,London Stock Exchange,USD,0.01,1,true,
+A1P0.DE,Defiance AI & Power Infrastructure ETF,Defiance AI & Power Infrastructure ETF USD Acc,ETF,REAL,XETRA,EUR,0.001,1,true,
+C7A0.DU,Contemporary Amperex Technology,"Contemporary Amperex Technology Co., Limited",STOCK,REAL,XETRA,EUR,0.01,1,true,C7A0.DE

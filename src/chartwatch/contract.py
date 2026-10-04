@@ -73,6 +73,7 @@ def build_catalog(conn: sqlite3.Connection, instruments: list[Instrument]) -> di
         payload.append(
             {
                 "ticker": instrument.ticker,
+                "aliases": list(instrument.aliases),
                 "display_name": instrument.display_name,
                 "name": instrument.name,
                 "asset_class": instrument.asset_class,
