@@ -14,16 +14,16 @@
     </div>
     <div class="reports-controls">
       <label class="check">
-        <input type="file" id="file-input" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
+        <input type="file" id="file-input" accept=".xlsx,.zip,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip" hidden>
         <button type="button" id="import-btn" class="primary">Import report…</button>
       </label>
     </div>
   </header>
 
   <div class="freshness">
-    <span id="fresh-report" class="muted">Report: none</span>
-    <span id="fresh-screener" class="muted">Screener: not checked</span>
-    <span id="fresh-import" class="muted">Import: —</span>
+    <span class="fresh-chip"><span class="fresh-chip-k">Report</span><span id="fresh-report" class="fresh-chip-v muted">none</span></span>
+    <span class="fresh-chip"><span class="fresh-chip-k">Screener</span><span id="fresh-screener" class="fresh-chip-v muted">not checked</span></span>
+    <span class="fresh-chip"><span class="fresh-chip-k">Import</span><span id="fresh-import" class="fresh-chip-v muted">—</span></span>
   </div>
 
   <div id="import-error" class="hidden"></div>

@@ -144,8 +144,9 @@ async function handleImport(arrayBuffer, fileName) {
 
 async function onFile(file) {
   if (!file) return;
-  if (!file.name.toLowerCase().endsWith(".xlsx")) {
-    ui.showError("Please choose an .xlsx file.");
+  const lower = file.name.toLowerCase();
+  if (!lower.endsWith(".xlsx") && !lower.endsWith(".zip")) {
+    ui.showError("Please choose an .xlsx or .zip file.");
     return;
   }
   const buf = await file.arrayBuffer();

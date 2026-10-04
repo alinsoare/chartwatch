@@ -1,6 +1,13 @@
 /* XLSX unzip/sheet tests. Dev-time only: node tests/js/run_reports_xlsx.mjs */
 
-import { readFileSync, writeFileSync, unlinkSync } from "node:fs";
+import {
+  readFileSync,
+  existsSync,
+  mkdtempSync,
+  rmSync,
+} from "node:fs";
+import { execFileSync } from "node:child_process";
+import { homedir, tmpdir } from "node:os";
 import { deflateRawSync } from "node:zlib";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -164,6 +171,110 @@ if (readFileSync(realPath)) {
     if (!pAlt.ok || pAlt.metadata.equityUndeterminable) {
       fail("equity with Open position value metric label");
     }
+
+    const nestedZip = buildZipFixed([
+      [`folder/sub/report.xlsx`, realBuf],
+    ]);
+    const nestedAb = nestedZip.buffer.slice(
+      nestedZip.byteOffset,
+      nestedZip.byteOffset + nestedZip.byteLength,
+    );
+    const fromZip = await parseReportFile(nestedAb);
+    if (!fromZip.ok) fail(`nested zip parse: ${fromZip.error}`);
+    else if (
+      fromZip.closedTrades.length !== parsed.closedTrades.length ||
+      fromZip.openLegs.length !== parsed.openLegs.length ||
+      fromZip.metadata.account !== parsed.metadata.account
+    ) {
+      fail("nested zip parse differs from bare xlsx");
+    }
+
+    const macZip = buildZipFixed([
+      ["__MACOSX/._report.xlsx", Buffer.from("junk", "utf8")],
+      ["reports/EUR_real.xlsx", realBuf],
+      ["readme.txt", Buffer.from("notes", "utf8")],
+    ]);
+    const macAb = macZip.buffer.slice(macZip.byteOffset, macZip.byteOffset + macZip.byteLength);
+    const fromMacZip = await parseReportFile(macAb);
+    if (!fromMacZip.ok) fail(`mac junk zip parse: ${fromMacZip.error}`);
+    else if (fromMacZip.closedTrades.length !== parsed.closedTrades.length) {
+      fail("mac junk zip closed trade count");
+    }
+
+    const emptyZip = buildZipFixed([]);
+    const emptyAb = emptyZip.buffer.slice(emptyZip.byteOffset, emptyZip.byteOffset + emptyZip.byteLength);
+    const emptyResult = await parseReportFile(emptyAb);
+    if (emptyResult.ok || !emptyResult.error?.includes("no .xlsx report")) {
+      fail(`empty zip expected no-xlsx error, got ${emptyResult.ok ? "ok" : emptyResult.error}`);
+    }
+
+    const noXlsxZip = buildZipFixed([["notes/readme.txt", Buffer.from("hello", "utf8")]]);
+    const noXlsxAb = noXlsxZip.buffer.slice(
+      noXlsxZip.byteOffset,
+      noXlsxZip.byteOffset + noXlsxZip.byteLength,
+    );
+    const noXlsxResult = await parseReportFile(noXlsxAb);
+    if (noXlsxResult.ok || !noXlsxResult.error?.includes("no .xlsx report")) {
+      fail(`text-only zip expected no-xlsx error, got ${noXlsxResult.ok ? "ok" : noXlsxResult.error}`);
+    }
+
+    const twoZip = buildZipFixed([
+      ["a/report_a.xlsx", realBuf],
+      ["b/report_b.xlsx", realBuf],
+    ]);
+    const twoAb = twoZip.buffer.slice(twoZip.byteOffset, twoZip.byteOffset + twoZip.byteLength);
+    const twoResult = await parseReportFile(twoAb);
+    if (twoResult.ok || !twoResult.error?.includes("exactly one")) {
+      fail(`two-report zip expected rejection, got ${twoResult.ok ? "ok" : twoResult.error}`);
+    }
+    if (twoResult.error && !twoResult.error.includes("report_a.xlsx")) {
+      fail("two-report zip error should list report names");
+    }
+  }
+}
+
+const miniAb = miniXlsx.buffer.slice(miniXlsx.byteOffset, miniXlsx.byteOffset + miniXlsx.byteLength);
+const miniZip = buildZipFixed([["nested/synthetic.xlsx", Buffer.from(miniAb)]]);
+const miniZipAb = miniZip.buffer.slice(miniZip.byteOffset, miniZip.byteOffset + miniZip.byteLength);
+const { parseReportFile: parseReportFile2 } = await import("../../web/reports/parse.js");
+const bareMini = await parseReportFile2(miniAb);
+const miniFromZip = await parseReportFile2(miniZipAb);
+if (miniFromZip.ok !== bareMini.ok || miniFromZip.error !== bareMini.error) {
+  fail(
+    `synthetic xlsx in zip should match bare mini workbook result (zip: ${miniFromZip.error ?? "ok"}, bare: ${bareMini.error ?? "ok"})`,
+  );
+}
+
+const sampleXlsx = join(
+  homedir(),
+  "xtb-reports/reports/51940879/EUR_51940879_2006-01-01_2026-10-02.xlsx",
+);
+if (existsSync(sampleXlsx)) {
+  const tmpDir = mkdtempSync(join(tmpdir(), "cw-zip-import-"));
+  const zipPath = join(tmpDir, "sample.zip");
+  try {
+    execFileSync("python3", ["-m", "zipfile", "-c", zipPath, sampleXlsx], { stdio: "pipe" });
+    const zipBuf = readFileSync(zipPath);
+    const zipAb = zipBuf.buffer.slice(zipBuf.byteOffset, zipBuf.byteOffset + zipBuf.byteLength);
+    const bareBuf = readFileSync(sampleXlsx);
+    const bareAb = bareBuf.buffer.slice(bareBuf.byteOffset, bareBuf.byteOffset + bareBuf.byteLength);
+    const bareParsed = await parseReportFile2(bareAb);
+    const zipParsed = await parseReportFile2(zipAb);
+    if (!bareParsed.ok) fail(`sample bare xlsx: ${bareParsed.error}`);
+    else if (!zipParsed.ok) fail(`sample zip xlsx: ${zipParsed.error}`);
+    else if (
+      zipParsed.closedTrades.length !== bareParsed.closedTrades.length ||
+      zipParsed.openLegs.length !== bareParsed.openLegs.length ||
+      zipParsed.metadata.account !== bareParsed.metadata.account
+    ) {
+      fail("sample zip vs bare xlsx metadata/count mismatch");
+    } else {
+      process.stdout.write(
+        `sample zip parity: ${zipParsed.closedTrades.length} closed, account ${zipParsed.metadata.account}\n`,
+      );
+    }
+  } finally {
+    rmSync(tmpDir, { recursive: true, force: true });
   }
 }
 

@@ -358,10 +358,60 @@ function dedupeOpenLegs(legs) {
   return out;
 }
 
+function isXlsxReportEntry(name) {
+  const norm = name.replace(/\\/g, "/");
+  if (norm.endsWith("/")) return false;
+  if (!/\.xlsx$/i.test(norm)) return false;
+  const segments = norm.split("/");
+  if (segments.some((s) => s === "__MACOSX")) return false;
+  const base = segments[segments.length - 1] ?? "";
+  if (base.startsWith("._")) return false;
+  if (base.startsWith("~$")) return false;
+  return true;
+}
+
+/**
+ * @param {Map<string, Uint8Array>} entries
+ * @param {(ab: ArrayBuffer) => Promise<Map<string, Uint8Array>>} unzipXlsx
+ */
+export async function resolveWorkbookEntries(entries, unzipXlsx) {
+  if (entries.has("xl/workbook.xml")) {
+    return { ok: true, entries };
+  }
+
+  const candidates = [];
+  for (const [name, bytes] of entries) {
+    if (isXlsxReportEntry(name)) candidates.push({ name, bytes });
+  }
+
+  if (candidates.length === 1) {
+    const { bytes } = candidates[0];
+    const innerAb = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    const innerEntries = await unzipXlsx(innerAb);
+    return { ok: true, entries: innerEntries };
+  }
+
+  if (candidates.length > 1) {
+    const names = candidates.map((c) => c.name).join(", ");
+    return {
+      ok: false,
+      error: `Expected exactly one .xlsx report in the archive; found: ${names}`,
+    };
+  }
+
+  if (!entries.has("[Content_Types].xml")) {
+    return { ok: false, error: "The archive contains no .xlsx report." };
+  }
+
+  return { ok: true, entries };
+}
+
 export async function parseReportFile(arrayBuffer) {
   const { unzipXlsx } = await import("./xlsx/unzip.js");
   const { readWorkbookSheets } = await import("./xlsx/sheet.js");
-  const entries = await unzipXlsx(arrayBuffer);
-  const sheets = readWorkbookSheets(entries);
+  const outerEntries = await unzipXlsx(arrayBuffer);
+  const resolved = await resolveWorkbookEntries(outerEntries, unzipXlsx);
+  if (!resolved.ok) return resolved;
+  const sheets = readWorkbookSheets(resolved.entries);
   return parseReport(sheets);
 }
