@@ -1,0 +1,199 @@
+@import url("../styles.css");
+
+body.reports-page {
+  display: block;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 20px 40px;
+}
+
+.reports-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+
+.reports-head h1 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.reports-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.reports-controls button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-raised);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.reports-controls button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.reports-controls button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.summary-subset-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  max-width: 52rem;
+}
+
+.section-note {
+  margin: 0 0 12px;
+  max-width: 52rem;
+}
+
+.section-panel {
+  margin-top: 8px;
+}
+
+.freshness {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  margin: 8px 0;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.summary-grid strong {
+  display: block;
+  font-size: 15px;
+}
+
+#recon-notice {
+  color: var(--warn);
+  margin: 8px 0;
+}
+
+#tab-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 16px 0 8px;
+}
+
+#tab-bar .tab {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-raised);
+  color: var(--text);
+  cursor: pointer;
+}
+
+#tab-bar .tab.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.data-table th,
+.data-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.data-table th {
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.ladder-table td {
+  vertical-align: top;
+}
+
+.projections-row td {
+  background: var(--bg-raised);
+  padding-top: 0;
+}
+
+.level-list.compact {
+  margin: 4px 0 8px;
+  font-size: 12px;
+}
+
+.level-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.level-list .active-rung {
+  color: var(--accent);
+}
+
+#category-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: center;
+  margin: 10px 0;
+  font-size: 13px;
+}
+
+.filter-title {
+  color: var(--muted);
+}
+
+#import-error {
+  color: var(--down);
+  margin: 8px 0;
+}
+
+#import-error.notice-with-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+#import-error .notice-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+#import-error .notice-actions button {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-raised);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+#storage-notice {
+  color: var(--warn);
+  margin: 8px 0;
+}

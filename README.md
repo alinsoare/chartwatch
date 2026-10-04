@@ -35,7 +35,31 @@ node tests/js/run_scroll_lock.mjs # chart-tool drag-pan suppression + undo (dev-
 node tests/js/run_viewport.mjs   # default chart framing (dev-time only)
 node tests/js/run_auto_scale.mjs # AUTO vertical-scale range math (dev-time only)
 node tests/js/run_screener.mjs    # accumulation screener rules (dev-time only)
+node tests/js/run_reports_settings.mjs  # XTB reports strategy constants (dev-time only)
+node tests/js/run_reports_xlsx.mjs      # XTB report unzip/parse (dev-time only)
+node tests/js/run_reports_ladder.mjs    # ladder projection rules (dev-time only)
+node tests/js/run_reports_screener_check.mjs  # auto screener fetch dedupe (dev-time only)
 ```
+
+## XTB report analysis (`web/reports/`)
+
+A separate page (linked from the chart sidebar) for importing a personal XTB
+account `.xlsx` export. Parsing, ranking, and ladder projection run entirely in
+the browser; nothing is uploaded. Rankings and ladders are recomputed on every
+load from cached parsed trades stored in IndexedDB.
+
+- **Import** — choose or drop one `.xlsx` with Closed Positions, Open Positions,
+  and Cash Operations sheets. Re-import replaces the cached report after
+  confirmation; screener data is kept.
+- **Data on disk** — the page never reads broker files from the repo. Published
+  screener confirmation uses same-origin `data/screener-scores.json` and
+  `data/catalog.json` (under `dist/data/` on the static site). Those files are
+  fetched automatically on every page load and again after each import; cached
+  screener data still renders immediately while a background refresh runs.
+- **Strategy constants** — ladder rungs, triggers, tax rate, ranking weights,
+  semaphore thresholds, and related knobs live in `web/reports/settings.js`.
+  Edit that module and reload; a cached report picks up the new values without
+  re-import.
 
 ## Two modes, one frontend
 

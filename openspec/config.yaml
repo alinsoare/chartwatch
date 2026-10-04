@@ -21,15 +21,18 @@ context: |
 
   Non-negotiable constraint carried over from the reference app: the app is
   offline-first by design. In the application — dev UI and published site —
-  data syncs only because the user asked for it: a sync control pressed. Do not
-  propose client-side scheduling, a refresh that runs without the user pressing
-  a sync control, startup auto-sync,
-  fetch-on-view, live streaming quotes, websockets, or any network call
-  triggered merely by loading/viewing a chart. The single sanctioned exception
-  is the release workflow's twice-daily CI schedule (03:00 and 15:00 UTC), which keeps the
-  published snapshot fresh without anyone touching GitHub. If a feature seems to
-  need fresher data in the app, the answer is a control the user operates, not
-  an implicit fetch.
+  chart-page market data syncs only because the user pressed the sync control.
+  Do not propose client-side scheduling, a refresh that runs without the user
+  pressing a sync control, startup auto-sync, fetch-on-view, live streaming
+  quotes, websockets, or any network call triggered merely by loading/viewing
+  a chart. Named exception (reports page only): the XTB reports page always
+  fetches `data/screener-scores.json` and `data/catalog.json` on every page load
+  and after every import, including when no report is cached yet — this is the
+  automatic screener check, not chart market-data sync. The release workflow's
+  twice-daily CI schedule (03:00 and 15:00 UTC) is a separate exception that
+  keeps the published snapshot fresh without anyone touching GitHub. If chart
+  data seems to need fresher values, the answer is a control the user operates,
+  not an implicit fetch.
 
   Conceptual responsibilities worth preserving (not file names — this is a
   fresh design): fetching market data, persisting/querying it, deriving

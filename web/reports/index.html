@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>chartwatch — reports</title>
+  <link rel="stylesheet" href="reports.css">
+</head>
+<body class="reports-page">
+  <header class="reports-head">
+    <div>
+      <h1>XTB report analysis</h1>
+      <p class="muted"><a href="../index.html">← Back to charts</a></p>
+    </div>
+    <div class="reports-controls">
+      <label class="check">
+        <input type="file" id="file-input" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
+        <button type="button" id="import-btn" class="primary">Import report…</button>
+      </label>
+    </div>
+  </header>
+
+  <div class="freshness">
+    <span id="fresh-report" class="muted">Report: none</span>
+    <span id="fresh-screener" class="muted">Screener: not checked</span>
+    <span id="fresh-import" class="muted">Import: —</span>
+  </div>
+
+  <div id="import-error" class="hidden"></div>
+  <div id="storage-notice" class="hidden"></div>
+
+  <div id="empty-state">
+    <p class="muted">No report loaded. Import an XTB export to see rankings and ladders.</p>
+  </div>
+
+  <div id="dashboard" class="hidden">
+    <div id="recon-notice" class="hidden"></div>
+    <div id="report-summary"></div>
+    <div id="category-filters"></div>
+    <div id="tab-bar" role="tablist"></div>
+    <div id="tab-panels"></div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
