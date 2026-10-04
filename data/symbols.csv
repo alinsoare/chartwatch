@@ -97,7 +97,7 @@ MIH.F,Mitsubishi Heavy Industries Ltd,"Mitsubishi Heavy Industries, Ltd.",STOCK,
 MSE.PA,Amundi Euro Stoxx 50 UCITS ETF (Dist EUR),Amundi EURO STOXX 50 II UCITS ETF Acc,ETF,REAL,Euronext Paris,EUR,0.01,1,true
 MUR1.F,Murata Manufacturing Co Ltd,"Murata Manufacturing Co., Ltd.",STOCK,REAL,XETRA,EUR,0.01,1,true
 NADQ.DE,"Lyxor Nasdaq-100 UCITS ETF - Acc (Dist, EUR)",Amundi Core Nasdaq-100 Swap UCITS ETF Dist,ETF,REAL,XETRA,EUR,0.01,1,true
-NDX1.DE,"iShares NASDAQ-100® UCITS DE (Dist, EUR)",Nordex SE,STOCK,REAL,XETRA,EUR,0.01,1,true
+NDX1.DE,Nordex SE,Nordex SE,STOCK,REAL,XETRA,EUR,0.01,1,true
 P500.DE,Invesco S&P 500 UCITS (Acc EUR),Invesco S&P 500 UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
 PE500.PA,"Amundi PEA S&P 500 UCITS C/D (Acc, EUR)",Amundi PEA S&P 500 Screened UCITS ETF - Acc,ETF,REAL,Euronext Paris,EUR,0.01,1,true
 QDVA.DE,"iShares Edge MSCI USA Mmntm Fctr UCITS (Acc, EUR)",iShares Edge MSCI USA Momentum Factor UCITS ETF USD (Acc),ETF,REAL,XETRA,EUR,0.01,1,true
@@ -107,11 +107,10 @@ QDVE.DE,iShares S&P 500 Information Technology Sector UCITS ETF (Acc EUR),iShare
 SAAB-B.ST,Saab AB - class B,Saab AB (publ),STOCK,REAL,Nasdaq Stockholm,SEK,0.01,1,true
 SALM.OL,Salmar ASA,SalMar ASA,STOCK,REAL,Oslo Børs,NOK,0.01,1,true
 SGAS.DE,"iShares MSCI USA ESG Screened UCITS (Acc, EUR)",iShares MSCI USA Screened UCITS ETF USD (Acc),ETF,REAL,XETRA,EUR,0.01,1,true
-SMSE.L,"Invesco MSCI ope UCITS (Acc, EUR)",Leverage Shares -1x Microsoft ETP Securities,STOCK,REAL,XETRA,EUR,0.001,1,true
+SMSEUR.MI,"Invesco MSCI Europe UCITS (Acc, EUR)",Invesco MSCI Europe UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
 SPPY.DE,"SPDR S&P 500 ESG Leaders UCITS (Acc, EUR)",State Street SPDR S&P 500 Leaders UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
 SPY5.DE,"SPDR S&P 500 UCITS ETF (Dist, EUR)",State Street SPDR S&P 500 UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
 SPYF.DE,"SPDR FTSE UK All Share UCITS (Acc, EUR)",State Street SPDR FTSE UK All Share UCITS ETF Acc,ETF,REAL,XETRA,EUR,0.01,1,true
-EXXY.DE,iShares EURO STOXX 50 UCITS ETF DE (Dist EUR),iShares Diversified Commodity Swap UCITS ETF (DE),ETF,REAL,XETRA,EUR,0.01,1,true
 SXR8.DE,iShares Core S&P 500 UCITS ETF (Acc EUR),iShares Core S&P 500 UCITS ETF USD (Acc),ETF,REAL,XETRA,EUR,0.01,1,true
 SXRT.DE,iShares Core EURO STOXX 50 UCITS ETF (Acc EUR),iShares VII PLC - iShares Core EURO STOXX 50 ETF EUR Acc,ETF,REAL,XETRA,EUR,0.01,1,true
 SXRV.DE,iShares NASDAQ 100 UCITS ETF (Acc EUR),iShares NASDAQ 100 UCITS ETF USD (Acc),ETF,REAL,XETRA,EUR,0.01,1,true
@@ -145,6 +144,24 @@ JNHD.DE,MSCI Japan,iShares MSCI Japan UCITS ETF,ETF,REAL,XETRA,EUR,0.01,1,true
 PTC,PTC,PTC Inc.,STOCK,REAL,NASDAQ,USD,0.01,1,true
 URNU.DE,Uranium,Global X Uranium UCITS ETF USD Acc,ETF,REAL,XETRA,EUR,0.01,1,true
 VGEK.DE,FTSE Developed Asia Pacific ex Japan,Vanguard FTSE Developed Asia Pacific ex Japan UCITS ETF USD Acc,ETF,REAL,XETRA,EUR,0.01,1,true
+MSF.DE,Microsoft Corp,Microsoft Corporation,STOCK,REAL,XETRA,EUR,0.01,1,true
+FB2A.DE,Meta Platforms Inc,"Meta Platforms, Inc.",STOCK,REAL,XETRA,EUR,0.01,1,true
+1YD.DE,Broadcom Inc,Broadcom Inc.,STOCK,REAL,XETRA,EUR,0.01,1,true
+ASML.AS,ASML Holding NV,ASML Holding N.V.,STOCK,REAL,Euronext Amsterdam,EUR,0.01,1,true
+SAP.DE,SAP SE,SAP SE,STOCK,REAL,XETRA,EUR,0.01,1,true
+SIE.DE,Siemens AG,Siemens Aktiengesellschaft,STOCK,REAL,XETRA,EUR,0.01,1,true
+RHM.DE,Rheinmetall AG,Rheinmetall AG,STOCK,REAL,XETRA,EUR,0.01,1,true
+MC.PA,LVMH Moet Hennessy Louis Vuitton,LVMH Moët Hennessy Louis Vuitton SE,STOCK,REAL,Euronext Paris,EUR,0.01,1,true
+NOV.DE,Novo Nordisk A/S,Novo Nordisk A/S,STOCK,REAL,XETRA,EUR,0.01,1,true
+EUNL.DE,"iShares Core MSCI World UCITS ETF (Acc, EUR)",iShares Core MSCI World UCITS ETF USD (Acc),ETF,REAL,XETRA,EUR,0.001,1,true
+VWCE.DE,"Vanguard FTSE All-World UCITS ETF (Acc, EUR)",Vanguard FTSE All-World UCITS ETF USD Accumulation,ETF,REAL,XETRA,EUR,0.001,1,true
+IUSQ.DE,"iShares MSCI ACWI UCITS ETF (Acc, EUR)",iShares MSCI All Country World UCITS ETF USD Acc,ETF,REAL,XETRA,EUR,0.001,1,true
+IS3N.DE,"iShares Core MSCI EM IMI UCITS ETF (Acc, EUR)",iShares Core MSCI EM IMI UCITS ETF USD (Acc),ETF,REAL,XETRA,EUR,0.001,1,true
+QDV5.DE,"iShares MSCI India UCITS ETF (Acc, EUR)",iShares MSCI India UCITS ETF USD Acc,ETF,REAL,XETRA,EUR,0.001,1,true
+IUSN.DE,"iShares MSCI World Small Cap UCITS ETF (Acc, EUR)",iShares MSCI World Small Cap UCITS ETF USD (Acc),ETF,REAL,XETRA,EUR,0.001,1,true
+LDAX.DE,"Amundi DAX II UCITS ETF (Dist, EUR)",Amundi DAX II UCITS ETF Dist,ETF,REAL,XETRA,EUR,0.01,1,true
+EUNH.DE,"iShares Core € Govt Bond UCITS ETF (Dist, EUR)",iShares Core € Govt Bond UCITS ETF EUR (Dist),ETF,REAL,XETRA,EUR,0.001,1,true
+4GLD.DE,Xetra-Gold ETC,Xetra-Gold,ETC,REAL,XETRA,EUR,0.01,1,true
 ALI=F,Aluminum Futures,Aluminum futures,COMMODITY,CFD,COMEX,USD,0.01,1,true
 CL=F,Crude Oil Futures,Crude Oil futures,COMMODITY,CFD,NYMEX,USD,0.01,1,true
 GC=F,Gold Futures,Gold futures,COMMODITY,CFD,COMEX,USD,0.01,1,true
