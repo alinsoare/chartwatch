@@ -19,14 +19,19 @@ function effectiveNetRate(configuredPct, periodsHeld, settings) {
   return Math.max(configuredPct, floor);
 }
 
-function inferActiveRung(invested, settings) {
+function rungReached(invested, cumAmt, currentPx, epsilon) {
+  if (invested + epsilon >= cumAmt) return true;
+  return currentPx != null && cumAmt - invested < currentPx;
+}
+
+function inferActiveRung(invested, currentPx, settings) {
   const cum = settings.rungAmountsEur.reduce((acc, amt, i) => {
     acc.push((acc[i - 1] ?? 0) + amt);
     return acc;
   }, []);
   let active = 0;
   for (let i = 0; i < cum.length; i++) {
-    if (invested + 1e-9 >= cum[i]) active = i;
+    if (rungReached(invested, cum[i], currentPx, 1e-9)) active = i;
   }
   return active;
 }
@@ -111,33 +116,27 @@ function computeTriggers(basePrice, activeRung, legs, settings) {
     return acc;
   }, []);
 
-  let running = 0;
   let anchorDrawdown = null;
-  for (const leg of sortedLegs) {
-    running += (leg.volume ?? 0) * (leg.openPrice ?? 0);
-    while (activeRung + 1 < cum.length && running >= cum[activeRung + 1] - 1e-6) {
-      activeRung += 1;
-      if (basePrice > 0) {
+  if (activeRung > 0 && basePrice > 0) {
+    const px = currentPrice(legs);
+    let running = 0;
+    for (const leg of sortedLegs) {
+      running += (leg.volume ?? 0) * (leg.openPrice ?? 0);
+      // Must match inferActiveRung's tolerance so the active rung always has an anchor leg.
+      if (rungReached(running, cum[activeRung], px, 1e-9)) {
         anchorDrawdown = ((leg.openPrice - basePrice) / basePrice) * 100;
+        break;
       }
     }
   }
 
   const effective = [...ideals];
   if (activeRung + 1 < ideals.length && anchorDrawdown != null) {
-    let prevEffective = ideals[activeRung + 1] ?? ideals[activeRung];
+    let prevEffective = anchorDrawdown;
     for (let k = activeRung + 1; k < ideals.length; k++) {
-      if (k === activeRung + 1) {
-        const delta = (ideals[k] ?? 0) - (ideals[k - 1] ?? 0);
-        const raw = anchorDrawdown - delta;
-        effective[k] = Math.min(ideals[k], raw);
-        prevEffective = effective[k];
-      } else {
-        const delta = (ideals[k] ?? 0) - (ideals[k - 1] ?? 0);
-        const raw = prevEffective - delta;
-        effective[k] = Math.min(ideals[k], raw);
-        prevEffective = effective[k];
-      }
+      const spacing = Math.abs((ideals[k] ?? 0) - (ideals[k - 1] ?? 0));
+      effective[k] = Math.min(ideals[k], prevEffective - spacing);
+      prevEffective = effective[k];
     }
   }
   return { effectiveTriggers: effective, anchorDrawdown };
@@ -145,7 +144,7 @@ function computeTriggers(basePrice, activeRung, legs, settings) {
 
 function planState(invested, rungIndex, currentPx, settings) {
   const cum = settings.rungAmountsEur.slice(0, rungIndex + 1).reduce((a, b) => a + b, 0);
-  if (invested + 1e-6 >= cum) return "filled";
+  if (rungReached(invested, cum, currentPx, 1e-6)) return "filled";
   const trig = rungIndex === 0 ? null : settings.rungTriggersPct[rungIndex];
   if (trig == null) return "awaiting trigger";
   const triggerPx = planEntryPrice(settings._basePrice ?? 0, trig);
@@ -224,7 +223,7 @@ export function computeLadders(parsed, rankings, settings = defaultSettings()) {
     }
 
     settings._basePrice = basePrice;
-    const activeRung = inferActiveRung(held.invested, settings);
+    const activeRung = inferActiveRung(held.invested, price, settings);
     const oldest = sorted[0]?.openAt;
     const daysHeld = daysBetween(oldest, asOf);
     const periodsHeld = Math.max(
