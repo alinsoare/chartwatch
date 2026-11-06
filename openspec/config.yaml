@@ -44,6 +44,11 @@ context: |
   framework, no Node runtime dependency). Treat that as a starting default,
   not a hard requirement, unless the proposal says otherwise.
 
+orchestration:
+  tool: cursor
+  gate_quick: "for f in tests/js/run_*.mjs; do node $f >/dev/null || { echo FAIL $f; exit 1; }; done"
+  gate_full: "uv run python -m pytest && for f in tests/js/run_*.mjs; do node $f || exit 1; done && uvx vulture src --min-confidence 80"
+
 operations:
   archive:
     guidance:
