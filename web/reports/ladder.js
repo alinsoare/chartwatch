@@ -142,12 +142,12 @@ function computeTriggers(basePrice, activeRung, legs, settings) {
   return { effectiveTriggers: effective, anchorDrawdown };
 }
 
-function planState(invested, rungIndex, currentPx, settings) {
+function planState(invested, rungIndex, currentPx, settings, basePrice, trigPct) {
   const cum = settings.rungAmountsEur.slice(0, rungIndex + 1).reduce((a, b) => a + b, 0);
   if (rungReached(invested, cum, currentPx, 1e-6)) return "filled";
-  const trig = rungIndex === 0 ? null : settings.rungTriggersPct[rungIndex];
+  const trig = rungIndex === 0 ? null : trigPct;
   if (trig == null) return "awaiting trigger";
-  const triggerPx = planEntryPrice(settings._basePrice ?? 0, trig);
+  const triggerPx = planEntryPrice(basePrice, trig);
   if (currentPx != null && currentPx <= triggerPx) return "due";
   return "awaiting trigger";
 }
@@ -222,7 +222,6 @@ export function computeLadders(parsed, rankings, settings = defaultSettings()) {
       continue;
     }
 
-    settings._basePrice = basePrice;
     const activeRung = inferActiveRung(held.invested, price, settings);
     const oldest = sorted[0]?.openAt;
     const daysHeld = daysBetween(oldest, asOf);
@@ -265,7 +264,7 @@ export function computeLadders(parsed, rankings, settings = defaultSettings()) {
       const offsetPct = price != null ? ((exitPrice - price) / price) * 100 : null;
       const distance =
         k === activeRung && price != null ? exitPrice - price : null;
-      const state = planState(held.invested, k, price, settings);
+      const state = planState(held.invested, k, price, settings, basePrice, effectiveTriggers[k]);
       let reached = null;
       if (k === activeRung && price != null) {
         reached = price >= exitPrice;

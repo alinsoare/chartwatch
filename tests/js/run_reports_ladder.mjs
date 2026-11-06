@@ -164,6 +164,24 @@ if (bigBase.activeRung !== 2 || !sameTriggers(bigBase.effectiveTriggers, IDEAL_T
   fail(`R2 funded near base keeps ideal triggers: ${bigBase.activeRung} ${JSON.stringify(bigBase.effectiveTriggers)}`);
 }
 
+const ftgaLegs = [
+  [3, 31.695, "2026-08-01T00:00:00Z"],
+  [4, 29.84, "2026-09-01T00:00:00Z"],
+  [11, 28.62, "2026-10-01T00:00:00Z"],
+  [10, 27.255, "2026-11-06T00:00:00Z"],
+];
+const pastIdeal = ladderFor(ftgaLegs, 27.365);
+if (pastIdeal.activeRung !== 2 || !near(pastIdeal.effectiveTriggers[2], -19.008518693800287)) {
+  fail(`FTGA-like ladder on R2 re-anchored: ${pastIdeal.activeRung} ${JSON.stringify(pastIdeal.effectiveTriggers)}`);
+}
+if (pastIdeal.levels[2].planState !== "awaiting trigger" || pastIdeal.recommendation != null) {
+  fail(`R3 past ideal but not effective trigger is awaiting: ${pastIdeal.levels[2].planState} ${JSON.stringify(pastIdeal.recommendation)}`);
+}
+const pastEffective = ladderFor(ftgaLegs, 25.6);
+if (pastEffective.levels[2].planState !== "due") {
+  fail(`R3 past effective trigger is due: ${pastEffective.levels[2].planState}`);
+}
+
 if (failures) {
   console.error(`${failures} failure(s)`);
   process.exit(1);
