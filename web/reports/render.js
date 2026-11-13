@@ -195,6 +195,10 @@ function sortValue(row, column, ladderSort) {
   return row[column];
 }
 
+// Empties stay last in both directions only for these columns; the rest keep the
+// legacy flip until a separate change fixes them against report-dashboard's sort rule.
+const EMPTY_LAST_BOTH_WAYS = new Set(["volume"]);
+
 export function sortRows(rows, column, dir, { ladderSort = false } = {}) {
   const mul = dir === "asc" ? 1 : -1;
   const copy = [...rows];
@@ -207,7 +211,7 @@ export function sortRows(rows, column, dir, { ladderSort = false } = {}) {
     const av = sortValue(a, column, ladderSort);
     const bv = sortValue(b, column, ladderSort);
     const el = emptyLastCompare(av, bv);
-    if (el) return el * mul;
+    if (el) return EMPTY_LAST_BOTH_WAYS.has(column) ? el : el * mul;
     if (typeof av === "string" || typeof bv === "string") {
       return String(av).localeCompare(String(bv)) * mul;
     }
@@ -244,8 +248,45 @@ function ladderFlagsText(lad) {
   return list ? String(list) : "";
 }
 
-function ladderSortMeta(lad) {
+export function ladderVolume(legs) {
+  if (!Array.isArray(legs) || !legs.length) return null;
+  let sum = 0;
+  for (const leg of legs) {
+    if (!Number.isFinite(leg?.volume)) return null;
+    sum += leg.volume;
+  }
+  return sum;
+}
+
+export function fmtVolume(n) {
+  return n.toLocaleString("en-US", { maximumFractionDigits: 6 });
+}
+
+export function volumeCellHtml(legs) {
+  const total = ladderVolume(legs);
+  return total == null
+    ? naCell("Volume missing for one or more legs")
+    : fmtVolume(total);
+}
+
+export const LADDER_COLUMNS = [
+  ["name", "Instrument"],
+  ["ticker", "Ticker"],
+  ["category", "Category"],
+  ["strategy", "Strategy"],
+  ["legCount", "Legs"],
+  ["volume", "Volume"],
+  ["invested", "Invested"],
+  ["blendedAverage", "Avg price"],
+  ["currentPrice", "Current"],
+  ["unrealized", "P/L"],
+  ["ageDays", "Age (d)"],
+  ["flags", "Compliance"],
+];
+
+export function ladderSortMeta(lad) {
   const legCount = lad.legs?.length ?? 0;
+  const volume = ladderVolume(lad.legs);
   const flagsText = ladderFlagsText(lad);
   const strategy = ladderStrategyLabel(lad);
   return {
@@ -253,6 +294,7 @@ function ladderSortMeta(lad) {
     name: lad.name || lad.legs?.[0]?.name || "",
     category: lad.category || lad.legs?.[0]?.category || "",
     legCount,
+    volume,
     flagsText,
     _strategySort: lad.unsupported ? `z-${strategy}` : strategy,
     _sort: {
@@ -261,6 +303,7 @@ function ladderSortMeta(lad) {
       category: lad.category || lad.legs?.[0]?.category || "",
       strategy,
       legCount,
+      volume,
       invested: lad.invested ?? lad.held?.invested ?? null,
       blendedAverage: lad.blendedAverage ?? lad.held?.avg ?? null,
       currentPrice: lad.currentPrice ?? null,
@@ -430,6 +473,7 @@ export function createRenderer(root) {
     "openLegCount",
     "openDrawdownPct",
     "legCount",
+    "volume",
     "invested",
     "blendedAverage",
     "currentPrice",
@@ -661,19 +705,7 @@ export function createRenderer(root) {
     }
     const table = document.createElement("table");
     table.className = "data-table ladder-table";
-    const headers = [
-      ["name", "Instrument"],
-      ["ticker", "Ticker"],
-      ["category", "Category"],
-      ["strategy", "Strategy"],
-      ["legCount", "Legs"],
-      ["invested", "Invested"],
-      ["blendedAverage", "Avg price"],
-      ["currentPrice", "Current"],
-      ["unrealized", "P/L"],
-      ["ageDays", "Age (d)"],
-      ["flags", "Compliance"],
-    ];
+    const headers = LADDER_COLUMNS;
     appendSortableHead(table, headers, "ladders", refresh);
     const tbody = document.createElement("tbody");
     const colCount = headers.length;
@@ -690,6 +722,7 @@ export function createRenderer(root) {
         <td>${esc(lad.category || "—")}</td>
         <td>${strategyCell(lad)}</td>
         <td class="num">${lad.legCount}</td>
+        <td class="num">${volumeCellHtml(lad.legs)}</td>
         <td class="num">${lad.invested != null ? fmtEurAmount(lad.invested) : "—"}</td>
         <td class="num">${lad.blendedAverage != null ? lad.blendedAverage.toFixed(4) : "—"}</td>
         <td class="num">${lad.currentPrice != null ? lad.currentPrice.toFixed(4) : "—"}</td>
