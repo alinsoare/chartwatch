@@ -94,6 +94,77 @@ if (typeof ladderSortMeta === "function" && typeof sortRows === "function") {
   else ok("volume asc -> n/a last");
 }
 
+if (typeof ladderSortMeta === "function" && typeof sortRows === "function") {
+  const tickers = (rows, column, dir, opts) =>
+    sortRows(rows, column, dir, opts)
+      .map((r) => r.ticker)
+      .join(",");
+  const check = (label, got, want) => {
+    if (got !== want) fail(`${label}: got ${got}, want ${want}`);
+    else ok(label);
+  };
+
+  const rated = [
+    { ticker: "R3", rating: 3 },
+    { ticker: "RN", rating: null },
+    { ticker: "R5", rating: 5 },
+  ];
+  check("rating desc -> 5, 3, null", tickers(rated, "rating", "desc"), "R5,R3,RN");
+  check("rating asc -> 3, 5, null", tickers(rated, "rating", "asc"), "R3,R5,RN");
+
+  const signals = [
+    { ticker: "G", signal: "green" },
+    { ticker: "N", signal: null },
+    { ticker: "R", signal: "red" },
+    { ticker: "A", signal: "amber" },
+  ];
+  check("signal desc -> green, amber, red, null", tickers(signals, "signal", "desc"), "G,A,R,N");
+  check("signal asc -> red, amber, green, null", tickers(signals, "signal", "asc"), "R,A,G,N");
+
+  const invested = [
+    ladderSortMeta({ ticker: "U", unsupported: true, legs: [] }),
+    ladderSortMeta({ ticker: "L", invested: 100, legs: [] }),
+    ladderSortMeta({ ticker: "H", invested: 900, legs: [] }),
+  ];
+  check(
+    "invested desc -> unsupported ladder last",
+    tickers(invested, "invested", "desc", { ladderSort: true }),
+    "H,L,U",
+  );
+  check(
+    "invested asc -> unsupported ladder last",
+    tickers(invested, "invested", "asc", { ladderSort: true }),
+    "L,H,U",
+  );
+
+  const drawdown = [
+    { ticker: "X", openDrawdownPct: "n/a" },
+    { ticker: "Y", openDrawdownPct: null },
+    { ticker: "V", openDrawdownPct: -4.2 },
+    { ticker: "Z", openDrawdownPct: "" },
+  ];
+  check("mixed empties desc keep input order", tickers(drawdown, "openDrawdownPct", "desc"), "V,X,Y,Z");
+  check("mixed empties asc keep input order", tickers(drawdown, "openDrawdownPct", "asc"), "V,X,Y,Z");
+
+  const compliance = [
+    ladderSortMeta({ ticker: "OB", flags: ["over-budget"], legs: [] }),
+    ladderSortMeta({ ticker: "OK", flags: [], legs: [] }),
+  ];
+  if (compliance[1]._sort?.flags !== "Compliant") {
+    fail(`compliant ladder _sort.flags: ${JSON.stringify(compliance[1]._sort?.flags)}`);
+  } else ok("compliant ladder sorts as Compliant");
+  check(
+    "compliance asc -> compliant first",
+    tickers(compliance, "flags", "asc", { ladderSort: true }),
+    "OK,OB",
+  );
+  check(
+    "compliance desc -> compliant second",
+    tickers(compliance, "flags", "desc", { ladderSort: true }),
+    "OB,OK",
+  );
+}
+
 if (!Array.isArray(LADDER_COLUMNS)) {
   fail("LADDER_COLUMNS is not exported");
 } else {

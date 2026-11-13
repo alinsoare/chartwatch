@@ -173,13 +173,15 @@ function categoryAllowed(rowCategory, filterSet) {
   return filterSet.has(cat);
 }
 
+function isEmptySortValue(v) {
+  return v == null || v === "n/a" || v === "";
+}
+
 function emptyLastCompare(va, vb) {
-  const aEmpty = va == null || va === "n/a" || va === "";
-  const bEmpty = vb == null || vb === "n/a" || vb === "";
-  if (aEmpty && bEmpty) return 0;
-  if (aEmpty) return 1;
-  if (bEmpty) return -1;
-  return 0;
+  const aEmpty = isEmptySortValue(va);
+  const bEmpty = isEmptySortValue(vb);
+  if (aEmpty === bEmpty) return 0;
+  return aEmpty ? 1 : -1;
 }
 
 function sortValue(row, column, ladderSort) {
@@ -195,23 +197,21 @@ function sortValue(row, column, ladderSort) {
   return row[column];
 }
 
-// Empties stay last in both directions only for these columns; the rest keep the
-// legacy flip until a separate change fixes them against report-dashboard's sort rule.
-const EMPTY_LAST_BOTH_WAYS = new Set(["volume"]);
-
 export function sortRows(rows, column, dir, { ladderSort = false } = {}) {
   const mul = dir === "asc" ? 1 : -1;
   const copy = [...rows];
   copy.sort((a, b) => {
     if (column === "signal") {
+      if (isEmptySortValue(a.signal) && isEmptySortValue(b.signal)) return 0;
       const el = emptyLastCompare(a.signal, b.signal);
-      if (el) return el * mul;
+      if (el) return el;
       return (signalSeverity(a.signal) - signalSeverity(b.signal)) * mul;
     }
     const av = sortValue(a, column, ladderSort);
     const bv = sortValue(b, column, ladderSort);
+    if (isEmptySortValue(av) && isEmptySortValue(bv)) return 0;
     const el = emptyLastCompare(av, bv);
-    if (el) return EMPTY_LAST_BOTH_WAYS.has(column) ? el : el * mul;
+    if (el) return el;
     if (typeof av === "string" || typeof bv === "string") {
       return String(av).localeCompare(String(bv)) * mul;
     }
@@ -309,7 +309,7 @@ export function ladderSortMeta(lad) {
       currentPrice: lad.currentPrice ?? null,
       unrealized: lad.unrealized ?? null,
       ageDays: lad.ageDays ?? null,
-      flags: flagsText,
+      flags: flagsText || "Compliant",
     },
   };
 }
